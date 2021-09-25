@@ -1,0 +1,880 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0065)https://tansik.egypt.gov.eg/application/Login/CheckVCodeSave.aspx -->
+<html><style>ytp-player-minimized{overflow:hidden;outline:none;}</style><script src="chrome-extension://ldkihpcibakajmpnggbjnehoifnnpebn/content.js"></script><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1256">
+    <title>بطاقة الاختيارات رقم
+			3073754
+    </title>
+    
+    <script type="text/javascript">
+        if(window.history.forward(1) != null)
+            window.history.forward(1);
+    </script>
+    <meta content="JavaScript" name="vs_defaultClientScript">
+    <meta content="http://schemas.microsoft.com/intellisense/ie3-2nav3-0" name="vs_targetSchema">
+    <meta content="Microsoft FrontPage 12.0" name="GENERATOR">
+    <meta content="FrontPage.Editor.Document" name="ProgId">
+    <meta content="Microsoft Visual Studio.NET 7.0" name="Originator">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+    
+    <script type="text/javascript" src="./globals.js.download"> </script>
+    <script type="text/javascript" src="./qrcode-min.js.download"> </script>
+    <script type="text/javascript" id="clientEventHandlersJS">
+   var AuthenticationCode = 0;     
+        function putStamp(ChoiceNumber, FacultyCode, FacultyName,TDName,Notes)
+        {
+
+            if(FacultyCode!=2000)
+                FacultyCode = FacultyCode%1000;
+            var htmlStamp = "&nbsp;";
+            if(FacultyCode > 0)
+            {
+                //htmlStamp = "	<table border='1' cellpadding='0' cellspacing='0' style='border-collapse: collapse' bordercolor='#111111' width='83' height='50'><tr>";
+                htmlStamp ="<p align='right'>";
+                htmlStamp = htmlStamp + FacultyName + "," + Notes;
+                htmlStamp = htmlStamp + "</p>";
+
+            }else{
+                htmlStamp= "<p align='right'>//////---------------///////</p>";
+            }
+
+            try{
+                document.getElementById(TDName+ChoiceNumber).innerHTML = htmlStamp;
+                AuthenticationCode = AuthenticationCode+(ChoiceNumber*100*FacultyCode)
+                }catch(err){}
+
+        }
+
+        function SplitNumber(Number, Length, Destination)
+        {
+            var i;
+            for(i=0; i<Length; i++)
+            {
+                document.getElementById(Destination + i).innerHTML = Number.substr(Length-eval(i)-1,1);
+
+            }
+        }
+
+        function DataArray(ArrayName, index)
+        {
+            return DataDoc.getElementById(ArrayName + index);
+        }
+ 
+        function Choices(ChoiceNumber)
+        {
+            return document.getElementById("c" + ChoiceNumber)
+        }
+
+        function FillReceipt(SeatNumber,StudentName, TotalMarks, RFormID, RDate)
+        {
+
+            document.getElementById("RSeatNumber").innerHTML = SeatNumber.toString() //.substr(1,7)// 6 digits cause
+            document.getElementById("StudentName").innerHTML = 'حبيبه عبدالرسول شوقى هجام';
+            document.getElementById("TotalMarks").innerHTML = TotalMarks
+            document.getElementById("RFormID").innerHTML = RFormID
+            document.getElementById("RDate").innerHTML = RDate
+            document.getElementById('QR').innerHTML = create_qrcode(RFormID + "," + SeatNumber+ "," +TotalMarks + "," +RDate+","+ (SeatNumber*TotalMarks)%  269+","+AuthenticationCode);
+        }
+        function create_qrcode(text, typeNumber, errorCorrectLevel, table) {
+
+            var qr = qrcode(8 || 4, errorCorrectLevel || 'M');
+            qr.addData(text);
+            qr.make();
+
+            //	return qr.createTableTag();
+            return qr.createImgTag();
+        }
+
+        function fillForm1()
+        {	
+   
+            document.getElementById("gov").innerHTML = window.parent.parent.frames[1].document.getElementById("BasicData").getAttribute("RulesData").split("#")[0]
+            document.getElementById("Sector").innerHTML = window.parent.parent.frames[1].document.getElementById("BasicData").getAttribute("RulesData").split("#")[1];
+            
+            
+            document.getElementById("Certificate").innerHTML = GetCertificateName(eval(window.parent.parent.frames[1].document.getElementById("BasicData").getAttribute("Rank")))            
+            document.getElementById("Branch").innerHTML =    document.getElementById("Certificate").innerHTML +"-"+window.parent.parent.frames[1].document.getElementById("BasicData").getAttribute("RulesData").split("#")[4];
+            document.getElementById("Religion").innerHTML = 'مسلم';
+            document.getElementById("Gender").innerHTML = "أنثى";
+            document.getElementById("BirthDate").innerHTML ="1/10/2003";
+            var SeatNumber = 1250985;
+            var DisplaySeatNumber = SeatNumber;
+            var Certificate = getParameterByName("Certificate",eval(BasicData.getAttribute("Rank")));
+            var totalmarks = eval(window.parent.parent.frames[1].document.getElementById("BasicData").getAttribute("TotalMarks"))*10;
+            
+            switch (eval(Certificate)){
+                case 1:
+                    //if (parseInt(SeatNumber,10) <= 1100000)//ثانوي أقل من مليون
+                        //DisplaySeatNumber = eval(eval(SeatNumber)-1000000)
+						   DisplaySeatNumber = eval(SeatNumber)
+                     /*if(  (",3,6,").indexOf(","+_BasicData.getAttribute("Rank")+",") >= 0 )  //متفوقين
+			{
+                        	//DisplaySeatNumber = eval(SeatNumber) - 1000000
+				BasicData.setAttribute("TotalMarks",eval(BasicData.getAttribute("TotalMarks"))*10/100)
+			}*/
+                  /*  if(parseInt(SeatNumber,10) < 1999999 && parseInt(SeatNumber,10) > 1000000) //ث عام حديث
+                        DisplaySeatNumber = eval(SeatNumber) - 1000000*/
+                    break;
+                case 2:
+                    totalmarks = (totalmarks /10).toPrecision(5);
+                    //if (parseInt(SeatNumber,10) < 5000000)//فني مدارس
+                        DisplaySeatNumber  = parseInt(SeatNumber.toString())//.substr(1,7),10)
+
+                    break;
+                case 3:
+                    DisplaySeatNumber  = eval(eval(SeatNumber)-6000000)
+                    document.getElementById("TotalMarks").style.display="none";
+                    document.getElementById("TotalMarks").innerHTML="";
+                    document.getElementById("Mo3adlaInstructions").style.display = "block";
+                    break;
+                case 4:
+                    DisplaySeatNumber  = eval(eval(SeatNumber)-9000000)
+                    document.getElementById("Institution").innerHTML = "<font size='4'><b>جـــامعة الأزهــر</b><br/>عام 2021</font>"
+                    document.getElementById("Institute").innerHTML = "المعهد الأزهري:"
+                    break;
+                case 5:
+                    DisplaySeatNumber = eval(eval(SeatNumber)-8000000)
+                    document.getElementById("TotalMarks").style.display="none";
+                    document.getElementById("TotalMarks").innerHTML="";
+                default:
+                    break;
+            }
+
+        
+           
+            switch(CurrentStudentService()){
+                case "Apply":
+            var i;
+            for(i=1; i<=60; i++)
+            {
+                if(Choices(i).getAttribute("FacultyCode")>=0 && Choices(i).getAttribute("FacultyCode")!=999 )
+                {
+                    var FacCode=Choices(i).getAttribute("FacultyCode");
+                    var Fac = DataArray("Faculties", FacCode)
+
+                    putStamp(i, Choices(i).getAttribute("FacultyCode"), Fac.getAttribute("Name"),"stamp",Fac.getAttribute("N"));
+                }
+                else
+                {
+                    putStamp(i, 0, "---------------","stamp");
+                }
+            }
+            for(i=61; i<=108; i++)
+            {
+                if(Choices(i).getAttribute("FacultyCode")>=0 && Choices(i).getAttribute("FacultyCode")!=999 )
+                {
+                    document.getElementById("ChoicesList2").style.display="block";
+                    document.getElementById("2ndPageFooter").style.display="block";
+                    var FacCode=Choices(i).getAttribute("FacultyCode");
+                    var Fac = DataArray("Faculties", FacCode)
+
+                    putStamp(i, Choices(i).getAttribute("FacultyCode"), Fac.getAttribute("Name"),"stamp",Fac.getAttribute("N"));
+                }
+                else
+                {
+                    putStamp(i, 0, "---------------","stamp");
+                }
+            }
+            break;
+                case "Transfer":
+                    document.getElementById("ChoicesList").style.display = "none";
+                    document.getElementById("TransferChoice").style.display = "block";
+                    if(Choices(1).getAttribute("FacultyCode")>=0 && Choices(1).getAttribute("FacultyCode")!=999 && Choices(1).getAttribute("FacultyCode")!=2000)
+                    {
+                        var FacCode=Choices(1).getAttribute("FacultyCode");
+                        var Fac = DataArray("Faculties", FacCode)
+
+                        putStamp(1, Choices(1).getAttribute("FacultyCode"), Fac.getAttribute("Name"),"Tstamp",Fac.getAttribute("N"));
+                        switch(eval(BasicData.getAttribute("TotalMarks2"))){
+                            case 1:
+                                document.getElementById("tTitle").innerHTML = '<font size=\'4\'>رغبة تقليل الاغتراب المناظر المسجلة بمكتب التنسيق</font>'
+                                break;
+                            case 2:
+                                document.getElementById("tTitle").innerHTML = '<font size=\'4\'>رغبة تقليل الاغتراب الغير المناظر المسجلة بمكتب التنسيق</font>'
+ 
+                                break;
+                            case 3:
+                                document.getElementById("tTitle").innerHTML = '<font size=\'4\'>رغبة إلغاء طلب تقليل الاغتراب</font>'
+ 
+                                break;
+                            case 4:
+                                document.getElementById("tTitle").innerHTML = '<font size=\'4\'>رغبة التماس خارج المنطقة أ لا ينطبق عليها تقليل قواعد الاغتراب (إنظر الدليل)</font>'
+ 
+                                break;
+                            case 5:
+                                document.getElementById("tTitle").innerHTML = '<font size=\'4\'>رغبة التحويل إلي معهد بنسبة 10% و بشرط استيفاء الحد الأدني للقبول </font>'
+ 
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        putStamp(1, 2000, "-----تم إلغاء طلب تقليل الاغتراب------","Tstamp","");
+                    }
+                    break;
+
+            }
+             
+            var DateValue =  "Thursday, September 16, 2021-8:52:51 PM"
+            FillReceipt(DisplaySeatNumber, document.getElementById("StudentName").innerHTML, (totalmarks/10).toPrecision(5), 3073754, DateValue)
+            
+        }    
+
+
+        function onPageLoad() 
+        {
+            SetDataDocs();
+
+            fillForm1();
+        }	
+
+        var checklistElements = window.parent.parent.frames[5].document;
+
+        function checkStep(step, status)
+        {
+            checklistElements.getElementById("step" + step.toString()).className = status;
+        }
+
+        function window_onload() {
+            //Title
+            window.parent.parent.frames[3].document.getElementById("title").innerHTML = "تابع الخطوة الخامسة : طباعة قائمة الرغبات";
+            //Update checklist	
+            checkStep(1, "Done");
+            checkStep(2, "Done");	
+            checkStep(3, "Done");
+            checkStep(4, "Done");
+            checkStep(5, "Done");
+            checkStep(6, "ToDo");
+	
+            onPageLoad();
+        }
+
+        function Print()
+        {
+            var a  = document.getElementById("Heading").innerHTML;
+            document.getElementById("Heading").innerHTML = "";
+	
+            window.print()
+	
+            document.getElementById("Heading").innerHTML = a;
+	
+        }
+        //-->
+    </script>
+
+    </head><body language="javascript" onload="return window_onload()"><data id="c0" facultycode="/"><data id="c1" facultycode="270"><data id="c2" facultycode="115"><data id="c3" facultycode="780"><data id="c4" facultycode="723"><data id="c5" facultycode="967"><data id="c6" facultycode="324"><data id="c7" facultycode="233"><data id="c8" facultycode="923"><data id="c9" facultycode="82"><data id="c10" facultycode="483"><data id="c11" facultycode="853"><data id="c12" facultycode="1150"><data id="c13" facultycode="53"><data id="c14" facultycode="158"><data id="c15" facultycode="712"><data id="c16" facultycode="742"><data id="c17" facultycode="412"><data id="c18" facultycode="439"><data id="c19" facultycode="396"><data id="c20" facultycode="312"><data id="c21" facultycode="112"><data id="c22" facultycode="759"><data id="c23" facultycode="12"><data id="c24" facultycode="512"><data id="c25" facultycode="948"><data id="c26" facultycode="746"><data id="c27" facultycode="940"><data id="c28" facultycode="944"><data id="c29" facultycode="440"><data id="c30" facultycode="556"><data id="c31" facultycode="941"><data id="c32" facultycode="947"><data id="c33" facultycode="719"><data id="c34" facultycode="749"><data id="c35" facultycode="965"><data id="c36" facultycode="956"><data id="c37" facultycode="962"><data id="c38" facultycode="379"><data id="c39" facultycode="326"><data id="c40" facultycode="966"><data id="c41" facultycode="475"><data id="c42" facultycode="162"><data id="c43" facultycode="236"><data id="c44" facultycode="152"><data id="c45" facultycode="713"><data id="c46" facultycode="559"><data id="c47" facultycode="718"><data id="c48" facultycode="748"><data id="c49" facultycode="743"><data id="c50" facultycode="372"><data id="c51" facultycode="562"><data id="c52" facultycode="893"><data id="c53" facultycode="895"><data id="c54" facultycode="178"><data id="c55" facultycode="580"><data id="c56" facultycode="971"><data id="c57" facultycode="994"><data id="c58" facultycode="1039"><data id="c59" facultycode="1163"><data id="c60" facultycode="241"><data id="c61" facultycode="284"><data id="c62" facultycode="336"><data id="c63" facultycode="374"><data id="c64" facultycode="377"><data id="c65" facultycode="542"><data id="c66" facultycode="587"><data id="c67" facultycode="588"><data id="c68" facultycode="634"><data id="c69" facultycode="654"><data id="c70" facultycode="760"><data id="c71" facultycode="444"><data id="c72" facultycode="295"><data id="c73" facultycode="292"><data id="c74" facultycode="294"><data id="c75" facultycode="293"><data id="c76" facultycode="999"><data id="c77" facultycode="999"><data id="c78" facultycode="999"><data id="c79" facultycode="999"><data id="c80" facultycode="999"><data id="c81" facultycode="999"><data id="c82" facultycode="999"><data id="c83" facultycode="999"><data id="c84" facultycode="999"><data id="c85" facultycode="999"><data id="c86" facultycode="999"><data id="c87" facultycode="999"><data id="c88" facultycode="999"><data id="c89" facultycode="999"><data id="c90" facultycode="999"><data id="c91" facultycode="999"><data id="c92" facultycode="999"><data id="c93" facultycode="999"><data id="c94" facultycode="999"><data id="c95" facultycode="999"><data id="c96" facultycode="999"><data id="c97" facultycode="999"><data id="c98" facultycode="999"><data id="c99" facultycode="999"><data id="c100" facultycode="999"><data id="c101" facultycode="999"><data id="c102" facultycode="999"><data id="c103" facultycode="999"><data id="c104" facultycode="999"><data id="c105" facultycode="999"><data id="c106" facultycode="999"><data id="c107" facultycode="999"><data id="c108" facultycode="999"><data id="c109" facultycode="999"><data id="c110" facultycode="999"><data id="c111" facultycode="999"><data id="c112" facultycode="999"><data id="c113" facultycode="999"><data id="c114" facultycode="999"><data id="c115" facultycode="999"><data id="c116" facultycode="999"><data id="c117" facultycode="999"><data id="c118" facultycode="999"><data id="c119" facultycode="999"><data id="c120" facultycode="999">
+    <style type="text/css">
+        .auto-style1 {
+            width: 107px;
+        }
+
+        .auto-style3 {
+            width: 34px;
+            font-size: small;
+        }
+
+        .auto-style4 {
+            width: 301px;
+            font-size: small;
+        }
+    </style>
+
+
+    <div id="Heading">
+        <p align="center">
+            تم تسجيل قائمة رغباتك بنجاح، رقم الإيصال
+				3073754<font color="red">
+				 احتفظ برقم الإيصال والرقم السري حتي ظهور النتيجة</font>
+        </p>
+        <p align="center">
+            <input type="button" value="إطبع الاستمارة وإيصال التسليم" style="FONT-WEIGHT: bold; FONT-SIZE: 15pt" name="PrintAppForm" onclick="Print()">
+        </p>
+    </div>
+    <div align="center">
+        <center>
+            <div dir="rtl" align="center">
+                <center dir="rtl">
+                    <table class="layoutTable" id="AutoNumber1" style="BORDER-COLLAPSE: collapse" width="650">
+                        <tbody><tr>
+                            <td dir="rtl" width="220" rowspan="2" colspan="2">
+                                <p dir="ltr" align="center">
+                                    <a id="Institution"><font size="4"><b>وزارة التعليم العالي</b></font><br>
+                                        <font size="2">مكتب تنسيق القبول بالجامعات والمعاهد</font><br>
+                                        <font size="4">عام
+													2021</font>
+                                </a></p><a id="Institution">
+                            </a></td>
+                            <td dir="rtl" width="213" align="center" rowspan="2" colspan="2"><font size="4"><strong>بطاقة الاختيار</strong></font><br>
+                                <font size="2">للتقدم برغبات التنسيق للحاصلين علي&nbsp;</font><br>
+                                <strong><a id="Certificate">الثانوية العامة </a></strong>
+                            </td>
+                            <td dir="rtl" align="center" width="258" colspan="2">
+                                <div id="QR"><img src="data:image/gif;base64,R0lGODdhcgByAIAAAAAAAP///ywAAAAAcgByAAAC/4yPqcvtD6OctNqLs968+w+G4kiW5omm6sq2bgXE8jwzdRDbNJI3d08D8IS4oJFiPC5+REVw6GAangdgcjfp6aDVZlGboFqnsihR7HWmH2A1lzxsd6VFspyLNiPPWCsdPtdX1vVGWBcImJfFR6cIaCcIJrk2hnjoGOE3WEmVyKfTqCQ3CVkpocnJOOj5GCZYuknphfq5CMvqqgl6FTq65vmXqZqqprvE+/olu6VsKqx3OSvL5NtKrerm86sN7ex7nT1pfFOYfYpMHI2bzl7bjr4Hrz7fvu5+by8vcndoboh3r9O/F+UGFqxGT0lBELTIKSuGBWKSQqEkRoQx7KJDWP/89PV7OC+OQoz1LInLeCtXLIrSSF2o+DHYNVoWrUkTuVCYQIQ4DSEE56onJJEb2YzkaQkXQGMsTxJdZWsgTDMOf44MBzXlnqb4jFZd1ixrUJBP42m8OVZr2phiezZcSfLswZZt2Qo9lmrix3NKQ451utck2qJ5a2316wyg220ysf11zI/q4EiObe6M1ZEyU4NeJwP9+hRw0ZRokB4eTTYhUMXHSGdMjHEo3smurTJTpDeyNsJXyj6+e/KyWn8QBHKEahwxcrrCw0LjG6jw8eZfQbO1bvOwa9noXFZfbhm81G3QgTGeFlB8brC2N3iv+y39e0x9678UH/picfXyDYf/1W0BdtFd1RlrNF2nX2yz5ZePWJuJthxvALa24IDvOFgZgrINl5p2PkWImVz/MZceVwKW92Fwr3l2Vi9oHZfTbSvClt9bq6UYIi+t7GcefSqV1luH0cwU5IQ8rjVOi+yhxBlvxN3nT5LfYaVWfE8aKVhhU47oYowaDgnXOUnCmGWRGeoG4XZQBpYOdyFGmcyWd2kAW5sg3RiedEntGeCM3alo0WUQ/jmnUdP9SWKgSi5GKJ+G2gVpX6ap5KaNcdYlI2vZRcoZo5B1Z95pJGpJ2VLkUaqcZKIyCCaQporZ1Y6o9pnTVIHJylKP/uGpIK537nrec6qF+SuWELGqa20v//6I6Z4+7qfifDmeeV5yxw7oK7QgEgkcsNc+mKhfZkXL5IapogqubzQ+6qKTbPpp7rdmZssuXHppiqOru8Er7jO3QroemWjai9+/qGVKoa6kruumuS5dSyeBC38qrapf2tdnchNXyqLFgGG8L1cK9/eWw8seeXCF4Y3M8ogme4mVsQa/2W+3DXOJ4c0MJ4wuwRaH2qrEn4KMYrxBb2mp0YU+Seus+S56NM27HNm0p7hdGnCZOvtHLzNWY01w1hxvLavMHGqcYK49p1z1IhJimPLDZZr9KKxI2VqjmWnijHdnd/s8W6NI+9m3B+t+BnfHqblLd9OZSYneq4vn/K+2Oq0+hjbZ7448scyNmso44O1dnnRUCGvO64W+jn4q0x8uBnTosQf7W+UUXj31zJcr7SwyvMtY+K+73Ctkt6Q3GzPgyq73t+TJy43yper6LqTcm4F+cr3B584tzt207uj321fY/e63g/87z1dmbzxt51vXXNFrbZr7yzNXWa7tigJppXMXIygo9hVvX8d7m5rsdyibqYwgDGygAx8IwQhKcIIUrKAFL4jBDGpwgyUoAAA7" width="114" height="114"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td dir="rtl" style="border-color: #333333; border-style: double;" colspan="2">&nbsp; رقم الإيصال:&nbsp;
+                                                <font size="4">
+                                                    <strong>
+                                                        <a id="RFormID">3073754</a>
+                                                    </strong></font>
+                                <br>
+                                <font size="1">
+                                    <strong><a id="RDate">Thursday, September 16, 2021-8:52:51 PM</a>
+                                    </strong></font>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">اسم الطالب :&nbsp;<strong><a id="StudentName">حبيبه عبدالرسول شوقى هجام</a></strong> </td>
+
+                            <td colspan="2" style="border: thick double #000000;"><font size="3"><strong>&nbsp;
+                                                رقم الجلوس:&nbsp;
+                                                    <a id="RSeatNumber">1250985</a>
+                            </strong></font></td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="4">التخصص :&nbsp;<strong><a id="Branch">الثانوية العامة -علمي علوم</a></strong><a id="Branch"> </a></td>
+
+                            <td colspan="2" style="border-color: #333333; border-style: double;">&nbsp;
+
+
+                                                المجموع الكلي:&nbsp; <font size="3">
+                                                    <strong><a id="TotalMarks">224.00</a>
+                                                    </strong></font></td>
+
+
+                        </tr>
+                        <tr>
+                            <td colspan="3">المحافظة :&nbsp; <strong><a id="gov">المنوفية            </a></strong></td>
+                            <td colspan="3"><a id="Institute">الإدارة التعليمية :&nbsp; </a><strong><a id="Sector">الباجور             </a></strong></td>
+
+
+
+
+
+                        </tr>
+                        <tr>
+                            <td>هاتف :&nbsp;<strong>01064686410</strong> </td>
+
+
+                            <td colspan="2" class="auto-style1">النوع :&nbsp;<strong><a id="Gender">أنثى</a></strong></td>
+
+
+                            <td colspan="2">الديانة:&nbsp;<strong><a id="Religion">مسلم</a><a></a></strong><a> </a></td>
+
+
+                            <td dir="rtl">تاريخ الميلاد :&nbsp;<strong><a id="BirthDate">1/10/2003</a></strong> </td>
+
+
+                        </tr>
+                    </tbody></table>
+                </center>
+            </div>
+        </center>
+    </div>
+    <center>
+        <table id="ChoicesList" width="650px" dir="rtl" cellpaddin="0" cellspacing="0" style="border: thin dashed #333333">
+            <tbody><tr>
+                <td align="center" colspan="4">
+                    <font size="4">قائمة الرغبات المسجلة في مكتب التنسيق</font>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">1.</td>
+                <td align="center" id="stamp1" class="auto-style4"><p align="right">أقتصاد منزلى المنوفية بشبين الكوم,</p></td>
+                <td align="center" class="auto-style3">31.</td>
+                <td align="center" id="stamp31" class="auto-style4"><p align="right">حقوق انتساب موجه أسيوط,</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">2.</td>
+                <td align="center" id="stamp2" class="auto-style4"><p align="right">أقتصاد منزلى بنات عين شمس,</p></td>
+                <td align="center" class="auto-style3">32.</td>
+                <td align="center" id="stamp32" class="auto-style4"><p align="right">حقوق انتساب موجه الإسكندرية,</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">3.</td>
+                <td align="center" id="stamp3" class="auto-style4"><p align="right">أقتصاد منزلى حلوان,</p></td>
+                <td align="center" class="auto-style3">33.</td>
+                <td align="center" id="stamp33" class="auto-style4"><p align="right">تربية نوعية المنوفية بأشمون,</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">4.</td>
+                <td align="center" id="stamp4" class="auto-style4"><p align="right">آداب المنوفية بشبين الكوم,</p></td>
+                <td align="center" class="auto-style3">34.</td>
+                <td align="center" id="stamp34" class="auto-style4"><p align="right">تربية نوعية بنها,</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">5.</td>
+                <td align="center" id="stamp5" class="auto-style4"><p align="right">آداب انتساب موجه المنوفية بشبين الكوم,</p></td>
+                <td align="center" class="auto-style3">35.</td>
+                <td align="center" id="stamp35" class="auto-style4"><p align="right">آداب انتساب موجه بنها,</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">6.</td>
+                <td align="center" id="stamp6" class="auto-style4"><p align="right">آداب أسيوط,</p></td>
+                <td align="center" class="auto-style3">36.</td>
+                <td align="center" id="stamp36" class="auto-style4"><p align="right">آداب انتساب موجه طنطا,</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">7.</td>
+                <td align="center" id="stamp7" class="auto-style4"><p align="right">آداب الفيوم,</p></td>
+                <td align="center" class="auto-style3">37.</td>
+                <td align="center" id="stamp37" class="auto-style4"><p align="right">آداب انتساب موجه الزقازيق,</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">8.</td>
+                <td align="center" id="stamp8" class="auto-style4"><p align="right">آداب المنيا,</p></td>
+                <td align="center" class="auto-style3">38.</td>
+                <td align="center" id="stamp38" class="auto-style4"><p align="right">آداب انتساب موجه أسوان,</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">9.</td>
+                <td align="center" id="stamp9" class="auto-style4"><p align="right">آداب الوادي الجديد,</p></td>
+                <td align="center" class="auto-style3">39.</td>
+                <td align="center" id="stamp39" class="auto-style4"><p align="right">آداب انتساب موجه أسيوط,</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">10.</td>
+                <td align="center" id="stamp10" class="auto-style4"><p align="right">آداب بنات عين شمس,</p></td>
+                <td align="center" class="auto-style3">40.</td>
+                <td align="center" id="stamp40" class="auto-style4"><p align="right">آداب انتساب موجه الإسكندرية,</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">11.</td>
+                <td align="center" id="stamp11" class="auto-style4"><p align="right">آداب بني سويف,</p></td>
+                <td align="center" class="auto-style3">41.</td>
+                <td align="center" id="stamp41" class="auto-style4"><p align="right">فنى تمريض بنها,يجب عليك اجتياز اختبار القدراتو لا بد من اجتياز اختبار القدرات الخاص</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">12.</td>
+                <td align="center" id="stamp12" class="auto-style4"><p align="right">آداب بور سعيد,</p></td>
+                <td align="center" class="auto-style3">42.</td>
+                <td align="center" id="stamp42" class="auto-style4"><p align="right">معهد العباسية للعلوم التجارية والحاسبات الالية ش(نظم معلومات)- القاهرة,EGP 4,998</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">13.</td>
+                <td align="center" id="stamp13" class="auto-style4"><p align="right">آداب جنوب الوادي,</p></td>
+                <td align="center" class="auto-style3">43.</td>
+                <td align="center" id="stamp43" class="auto-style4"><p align="right">العالي للدراسات المتطورة بالقطامية شعبة نظم معلومات إدارية- القاهرة,EGP 7,254</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">14.</td>
+                <td align="center" id="stamp14" class="auto-style4"><p align="right">آداب حلوان,</p></td>
+                <td align="center" class="auto-style3">44.</td>
+                <td align="center" id="stamp44" class="auto-style4"><p align="right">المعهد العالى للعلوم الادارية بأوسيم جيزة,EGP 6,919</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">15.</td>
+                <td align="center" id="stamp15" class="auto-style4"><p align="right">حقوق المنوفية بشبين الكوم,</p></td>
+                <td align="center" class="auto-style3">45.</td>
+                <td align="center" id="stamp45" class="auto-style4"><p align="right">تربية نوعية فنية المنوفية بأشمون,و لا بد من اجتياز اختبار القدرات الخاص</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">16.</td>
+                <td align="center" id="stamp16" class="auto-style4"><p align="right">حقوق بنها,</p></td>
+                <td align="center" class="auto-style3">46.</td>
+                <td align="center" id="stamp46" class="auto-style4"><p align="right">العالي خدمه اجتماعيه 6 اكتوبر- الجيزة,EGP 5,384</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">17.</td>
+                <td align="center" id="stamp17" class="auto-style4"><p align="right">حقوق طنطا,</p></td>
+                <td align="center" class="auto-style3">47.</td>
+                <td align="center" id="stamp47" class="auto-style4"><p align="right">تربية نوعية موسيقية المنوفية,و لا بد من اجتياز اختبار القدرات الخاص</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">18.</td>
+                <td align="center" id="stamp18" class="auto-style4"><p align="right">حقوق مدينة السادات,</p></td>
+                <td align="center" class="auto-style3">48.</td>
+                <td align="center" id="stamp48" class="auto-style4"><p align="right">تربية نوعية موسيقية بنها,و لا بد من اجتياز اختبار القدرات الخاص</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">19.</td>
+                <td align="center" id="stamp19" class="auto-style4"><p align="right">حقوق أسوان,</p></td>
+                <td align="center" class="auto-style3">49.</td>
+                <td align="center" id="stamp49" class="auto-style4"><p align="right">تربية نوعية فنية بنها,و لا بد من اجتياز اختبار القدرات الخاص</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">20.</td>
+                <td align="center" id="stamp20" class="auto-style4"><p align="right">حقوق أسيوط,</p></td>
+                
+                <td align="center" class="auto-style3">50.</td>
+                <td align="center" id="stamp50" class="auto-style4"><p align="right">العالي للدراسات الادبية كنج مريوط- الإسكندرية,EGP 5,725</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">21.</td>
+                <td align="center" id="stamp21" class="auto-style4"><p align="right">حقوق الإسكندرية,</p></td>
+                
+                <td align="center" class="auto-style3">51.</td>
+                <td align="center" id="stamp51" class="auto-style4"><p align="right">العالي خدمه اجتماعيه المنصوره- الدقهلية,EGP 5,252</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">22.</td>
+                <td align="center" id="stamp22" class="auto-style4"><p align="right">حقوق الفيوم,</p></td>
+               
+                <td align="center" class="auto-style3">52.</td>
+                <td align="center" id="stamp52" class="auto-style4"><p align="right">العالي خدمه إجتماعيه بور سعيد,EGP 4,909</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">23.</td>
+                <td align="center" id="stamp23" class="auto-style4"><p align="right">حقوق القاهرة,</p></td>
+                <td align="center" class="auto-style3">53.</td>
+                <td align="center" id="stamp53" class="auto-style4"><p align="right">معهد عالي خدمه إجتماعيه أسكندريه بمصروفات,EGP 4,909</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">24.</td>
+                <td align="&lt;center" id="stamp24" class="auto-style4"><p align="right">حقوق المنصورة,</p></td>
+                <td align="center" class="auto-style3">54.</td>
+                <td align="center" id="stamp54" class="auto-style4"><p align="right">العالى للعلوم الادارية بلقاس دقهلية ش نظم معلومات ادارية,EGP 7,981</p></td>
+            </tr>
+                        <tr>
+                <td align="center" class="auto-style3">25.</td>
+                <td align="center" id="stamp25" class="auto-style4"><p align="right">حقوق انتساب موجه المنوفية بشبين الكوم,</p></td>
+                <td align="center" class="auto-style3">55.</td>
+                <td align="center" id="stamp55" class="auto-style4"><p align="right">الإدارة والسكرتارية والحاسب بكلية البنات القبطية بالعباسية إدارة وسكرتارية- القاهرة,EGP 4,046</p></td>
+            </tr>
+                        <tr>
+                <td align="center" class="auto-style3">26.</td>
+                <td align="center" id="stamp26" class="auto-style4"><p align="right">حقوق انتساب موجه بنها,</p></td>
+                <td align="center" class="auto-style3">56.</td>
+                <td align="center" id="stamp56" class="auto-style4"><p align="right">الإدارة والسكرتارية والحاسب بكلية البنات نظم المعلومات الإدارية- القاهرة,EGP 4,444</p></td>
+            </tr>
+                        <tr>
+                <td align="center" class="auto-style3">27.</td>
+                <td align="center" id="stamp27" class="auto-style4"><p align="right">حقوق انتساب موجه طنطا,</p></td>
+                <td align="center" class="auto-style3">57.</td>
+                <td align="center" id="stamp57" class="auto-style4"><p align="right">الإدارة والسكرتاريه بمصر القديمه- القاهرة,EGP 4,562</p></td>
+            </tr>
+                        <tr>
+                <td align="center" class="auto-style3">28.</td>
+                <td align="center" id="stamp28" class="auto-style4"><p align="right">حقوق انتساب موجه الزقازيق,</p></td>
+                <td align="center" class="auto-style3">58.</td>
+                <td align="center" id="stamp58" class="auto-style4"><p align="right">السياحة والفنادق تعليم تبادلى أسكندرية,و لا بد من اجتياز اختبار القدرات الخاص</p></td>
+            </tr>
+                        <tr>
+                <td align="center" class="auto-style3">29.</td>
+                <td align="center" id="stamp29" class="auto-style4"><p align="right">حقوق انتساب موجه مدينة السادات,</p></td>
+                <td align="center" class="auto-style3">59.</td>
+                <td align="center" id="stamp59" class="auto-style4"><p align="right">السياحة والفنادق تعليم تبادلى حلوان,و لا بد من اجتياز اختبار القدرات الخاص</p></td>
+            </tr>
+                        <tr>
+                <td align="center" class="auto-style3">30.</td>
+                <td align="center" id="stamp30" class="auto-style4"><p align="right">حقوق انتساب موجه أسوان,</p></td>
+                <td align="center" class="auto-style3">60.</td>
+                <td align="center" id="stamp60" class="auto-style4"><p align="right">العالي قاهرة سياحة وفنادق مقطم- القاهرة,EGP 8,216</p></td>
+            </tr>
+        </tbody></table>
+        <table id="TransferChoice" width="650px" dir="rtl" cellpaddin="0" cellspacing="0" style="display:none;border: thin dashed #333333">
+            <tbody><tr>
+               <td id="tTitle" align="center" colspan="4">
+                    <font size="4">رغبة تقليل الاغتراب المسجلة بمكتب التنسيق          </font></td></tr>
+            <tr>
+                <td align="center" colspan="4"><div style="text-align:center">
+                    <font size="10"><span id="Tstamp1" style="align-content:center"></span></font>
+                    </div>
+                </td>
+            </tr>
+        </tbody></table>
+    </center>
+    <div id="Mo3adlaInstructions" style="display:none;text-align: center; font-size: medium; text-decoration-color: blue; font-family: Arial;">
+    <br>علي طلاب الشهادات المعادلة تسليم مظروف الأوراق مشتملا علي طباعة الرغبات و البيانات الأساسية إلي مكتب التنسيق<br> حيث لا يكتفي بالتسجيل الإلكتروني ولن يتم ترشيح أي طالب لم يقم بتسليم ملفه إلي المكتب في المواعيد المقررة
+   <br> الطالب وولي أمره هما المسئولان مسئولية كاملة عن المواد والدرجات التي يتم تسجيلها على شبكة الإنترنت، فيجب التأكد من إضافة جميع المواد المطلوبة والتى درسها الطالب بالشهادة بدرجاتها الصحيحة
+    </div>
+    <div align="center" style="text-align: center; font-size: medium; text-decoration-color: blue; font-family: Arial;">
+        تم تصميم وتنفيذ نظام وبرامج التنسيق الإلكتروني بواسطة فريق عمل من كلية الهندسة جامعة القاهرة</div>
+        
+        <p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p>
+                </p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><table>
+            <tbody><tr>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+            </tr>
+        </tbody></table>
+    
+<p style="page-break-before: always">
+    </p><center>
+        <table id="ChoicesList2" width="650px" dir="rtl" cellpaddin="0" cellspacing="0" style="display: block; border: thin dashed rgb(51, 51, 51);">
+            <tbody><tr>
+                <td align="center" colspan="4">
+                    <font size="4">&nbsp;تابع الرغبات المسجلة في مكتب التنسيق</font>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">61.</td>
+                <td align="center" id="stamp61" class="auto-style4"><p align="right">العالي للسياحه والفنادق و إرشاد السياحي بأبي قير- الإسكندرية,EGP 7,129</p></td>
+                <td align="center" class="auto-style3">85.</td>
+                <td align="center" id="stamp85" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">62.</td>
+                <td align="center" id="stamp62" class="auto-style4"><p align="right">العالي دراسات نوعية سياحه و فنادق جيزه,EGP 5,590</p></td>
+                <td align="center" class="auto-style3">86.</td>
+                <td align="center" id="stamp86" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">63.</td>
+                <td align="center" id="stamp63" class="auto-style4"><p align="right">العالي سياحة وفنادق الغردقة- البحر الاحمر,EGP 10,123</p></td>
+                <td align="center" class="auto-style3">87.</td>
+                <td align="center" id="stamp87" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">64.</td>
+                <td align="center" id="stamp64" class="auto-style4"><p align="right">الفراعنة العالي سياحة وفنادق بالمريوطية الهرم- الجيزة,EGP 7,619</p></td>
+                <td align="center" class="auto-style3">88.</td>
+                <td align="center" id="stamp88" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">65.</td>
+                <td align="center" id="stamp65" class="auto-style4"><p align="right">معهد سيناء العالى للدراسات النوعية  بمدينة العريش ش. دراسات سياحية وفندقية وارشاد سياحى (بالمقر البديل بالاسماعيلية)- شمال سيناء,EGP 7,771</p></td>
+                <td align="center" class="auto-style3">89.</td>
+                <td align="center" id="stamp89" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">66.</td>
+                <td align="center" id="stamp66" class="auto-style4"><p align="right">العالي الفندقى بالاقصر إيجوث,EGP 7,341</p></td>
+                <td align="center" class="auto-style3">90.</td>
+                <td align="center" id="stamp90" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">67.</td>
+                <td align="center" id="stamp67" class="auto-style4"><p align="right">العالي للسياحة والفنادق بالاسكندريه إيجوث,EGP 7,880</p></td>
+                <td align="center" class="auto-style3" 91.<="" td="">
+                    91.</td><td align="center" id="stamp91" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">68.</td>
+                <td align="center" id="stamp68" class="auto-style4"><p align="right">العالي سياحه وفنادق بالإسماعيليةايجوث- الاسماعيلية,EGP 7,180</p></td>
+                <td align="center" class="auto-style3">92.</td>
+                <td align="center" id="stamp92" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">69.</td>
+                <td align="center" id="stamp69" class="auto-style4"><p align="right">معهد عالي سياحه وفنادق كنج مريوط- الإسكندرية,EGP 7,354</p></td>
+                <td align="center" class="auto-style3">93.</td>
+                <td align="center" id="stamp93" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">70.</td>
+                <td align="center" id="stamp70" class="auto-style4"><p align="right">العالي سياحه وفنادق 6 اكتوبر- الجيزة,EGP 7,634</p></td>
+                <td align="center" class="auto-style3">94.</td>
+                <td align="center" id="stamp94" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">71.</td>
+                <td align="center" id="stamp71" class="auto-style4"><p align="right">الفني الصناعى للصناعات المتطورة النهضة اول مدينة السلام القاهرة,</p></td>
+                <td align="center" class="auto-style3">95.</td>
+                <td align="center" id="stamp95" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">72.</td>
+                <td align="center" id="stamp72" class="auto-style4"><p align="right">ك.ت. فني صناعى قويسنا,</p></td>
+                <td align="center" class="auto-style3">96.</td>
+                <td align="center" id="stamp96" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">73.</td>
+                <td align="center" id="stamp73" class="auto-style4"><p align="right">ك.ت. فني صناعى اسكندرية,</p></td>
+                <td align="center" class="auto-style3">97.</td>
+                <td align="center" id="stamp97" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">74.</td>
+                <td align="center" id="stamp74" class="auto-style4"><p align="right">ك.ت. فني صناعى اسوان,</p></td>
+                <td align="center" class="auto-style3">98.</td>
+                <td align="center" id="stamp98" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">75.</td>
+                <td align="center" id="stamp75" class="auto-style4"><p align="right">ك.ت. فني صناعى الزقازيق,</p></td>
+                <td align="center" class="auto-style3">99.</td>
+                <td align="center" id="stamp99" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">76.</td>
+                <td align="center" id="stamp76" class="auto-style4"><p align="right">//////---------------///////</p></td>
+                <td align="center" class="auto-style3">100.</td>
+                <td align="center" id="stamp100" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">77.</td>
+                <td align="center" id="stamp77" class="auto-style4"><p align="right">//////---------------///////</p></td>
+                <td align="center" class="auto-style3">101.</td>
+                <td align="center" id="stamp101" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">78.</td>
+                <td align="center" id="stamp78" class="auto-style4"><p align="right">//////---------------///////</p></td>
+                <td align="center" class="auto-style3">102.</td>
+                <td align="center" id="stamp102" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">79.</td>
+                <td align="center" id="stamp79" class="auto-style4"><p align="right">//////---------------///////</p></td>
+                <td align="center" class="auto-style3">103.</td>
+                <td align="center" id="stamp103" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">80.</td>
+                <td align="center" id="stamp80" class="auto-style4"><p align="right">//////---------------///////</p></td>
+                <td align="center" class="auto-style3">104.</td>
+                <td align="center" id="stamp104" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">81.</td>
+                <td align="center" id="stamp81" class="auto-style4"><p align="right">//////---------------///////</p></td>
+                <td align="center" class="auto-style3">105.</td>
+                <td align="center" id="stamp105" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">82.</td>
+                <td align="center" id="stamp82" class="auto-style4"><p align="right">//////---------------///////</p></td>
+                <td align="center" class="auto-style3">106.</td>
+                <td align="center" id="stamp106" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">83.</td>
+                <td align="center" id="stamp83" class="auto-style4"><p align="right">//////---------------///////</p></td>
+                <td align="center" class="auto-style3">107.</td>
+                <td align="center" id="stamp107" class="auto-style4"><p align="right">//////---------------///////</p></td>
+            </tr>
+            <tr>
+                <td align="center" class="auto-style3">84.</td>
+                <td align="center" id="stamp84" class="auto-style4"><p align="right">//////---------------///////</p></td>
+                <td align="center" class="auto-style3">108.</td>
+                <td align="center" id="stamp104" class="auto-style4">&nbsp;</td>
+            </tr>
+        </tbody></table>
+    </center>
+    <div id="2ndPageFooter" align="center" style="display: block; text-align: center; font-size: medium; text-decoration-color: blue; font-family: Arial;">
+        تم تصميم وتنفيذ نظام وبرامج التنسيق الإلكتروني بواسطة فريق عمل من كلية الهندسة جامعة القاهرة
+        <p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p>
+                </p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><table>
+            <tbody><tr>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+            </tr>
+        </tbody></table>
+    </div>
+    
+
+
+</data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></data></body></html>

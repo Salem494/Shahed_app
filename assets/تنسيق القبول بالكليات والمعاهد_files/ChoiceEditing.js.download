@@ -1,0 +1,1390 @@
+﻿
+function InvertUnivsCodes()
+{
+	var i;
+
+	for (i = DataDoc.getElementById("Universities").getAttribute("length") - 1; i > -1; i--)
+	{
+	    UnivIds[DataDoc.getElementById("Universities" + i).getAttribute("Code")] = i;
+	}
+}
+
+function Faculty(FacultyCode)
+{
+   
+    try {
+        return DataDoc.getElementById("Faculties" + FacultyCode);
+    } catch (e) {
+        //alert("1عزيزي الطالب ، لقد تم غلق التسجيل بإحدي الكليات المسجلة في رغباتك سابقا ، من فضلك قم بإعادة نسجيل الدخول واختيار قائمة رغبات جديدة" + FacultyCode)
+       // window.parent.parent.location = "./Default.aspx"
+
+    }
+}
+
+function FacultySpec(FacultyCode)
+{
+	if(FacultyCode<=0)
+		return -1;
+	else
+	    try{
+	        return Faculty(FacultyCode).getAttribute("SC");
+	    } catch (e) {
+	        //alert("2عزيزي الطالب ، لقد تم غلق التسجيل بإحدي الكليات المسجلة في رغباتك سابقا ، من فضلك قم بإعادة نسجيل الدخول واختيار قائمة رغبات جديدة" + FacultyCode)
+            
+	   // window.parent.parent.location = "./Default.aspx"
+
+	    }
+}
+
+function FacultyOrder(FacultyCode)
+{
+	if(FacultyCode<0)
+		return -1;
+	else
+	    try{
+	        return Faculty(FacultyCode).getAttribute("Order");
+	    } catch (e) {
+	        //alert("3عزيزي الطالب ، لقد تم غلق التسجيل بإحدي الكليات المسجلة في رغباتك سابقا ، من فضلك قم بإعادة نسجيل الدخول واختيار قائمة رغبات جديدة"+ FacultyCode)
+	        
+	    //window.parent.parent.location = "./Default.aspx"
+
+	    }
+}
+function FacultyLoc(FacultyCode)
+{
+	if(FacultyCode<0)
+		return -1;
+	else
+	    return Faculty(FacultyCode).getAttribute("LC");
+}
+
+function Choices(index)
+{
+	return DataDoc.getElementById("Choices" + index);
+}
+
+function ChoiceSpec(index)
+{
+    return FacultySpec(Choices(index).getAttribute("FacultyCode"));
+}
+
+function ChoiceLoc(index)
+{
+	return FacultyLoc(Choices(index).getAttribute("FacultyCode"));
+}
+
+function Push(ChoiceNumber)
+{
+	ChangedStack[ChangedStackPointer++] = ChoiceNumber;
+}
+
+function Pop()
+{
+	if(ChangedStackPointer>0)
+	{
+		return ChangedStack[--ChangedStackPointer];
+	}
+	else
+		return -1;
+}
+
+function Zone(ZoneCode)
+{
+	return DataDoc("Zones" + ZoneIds[ZoneCode]);
+}
+
+function ZoneFaculties(ZoneCode)
+{
+	return Zone(ZoneCode).Faculties;
+}
+
+function ZoneSpecializations(ZoneCode)
+{
+	return Zone(ZoneCode).Specializations;
+}
+
+
+function IsFromZone(FacultyCode, ZoneCode)
+{
+	return ZoneFaculties(ZoneCode).indexOf(","+FacultyCode+",")>=0;
+}
+
+
+function SpecializationExistsInZone(SpecializationCode, ZoneCode)
+{
+	return ZoneSpecializations(ZoneCode).indexOf("," + SpecializationCode + ",")>=0;
+}
+
+function CanBeFirst(FacultyCode, ZoneCode)
+{
+	var i;
+	
+	if(Faculty(FacultyCode).DistributionType!=1)
+		return true;
+	
+	if(IsFromZone(FacultyCode, ZoneCode))
+	{
+		return true;	
+	}
+
+	if(SpecializationExistsInZone(Faculty(FacultyCode).SpecializationCode, ZoneCode))
+	{
+		return false;
+	}
+		
+	return true;
+}
+
+
+function ApplySpecialZoneRule(Spec, ChoiceNumber, ZoneCode)
+{
+
+	
+	
+	if(!SpecializationExistsInZone(Spec, ZoneCode))
+	{
+		Choices(ChoiceNumber).Correct = true;
+	}
+	else
+	{
+		
+		var OtherZone = 3 - ZoneCode;
+		var CorrectionFlag=false;
+		
+		
+		var i;
+		for(i=0; i<ChoicesLimit; i++)
+		{
+			if(ChoiceSpec(i)==Spec)
+			{
+				
+				
+				if(IsFromZone(Choices(i).getAttribute("FacultyCode"), ZoneCode))
+				{
+					CorrectionFlag = true;
+					Choices(i).Correct = true;
+				}
+				
+				else if(IsFromZone(Choices(i).getAttribute("FacultyCode"), OtherZone))
+				{
+					if(Choices(i).Correct != CorrectionFlag)
+					{
+						Choices(i).Correct = CorrectionFlag;
+						Push(i);
+					}
+				}
+				else
+				{
+					Choices(i).Correct = true;
+				}
+			}
+		}
+	}
+}
+
+
+function ZonesSepcializationFacultyOrder(Spec,Precedance){
+    
+
+
+    var UnivOrderArray = BasicData.getAttribute("RulesData").split("#")[2].split(',')
+    var ExceptionOrderArrayA = BasicData.getAttribute("RulesData").split("#")[3].split(';')[0].split(",")
+    var ExceptionOrderArrayB = BasicData.getAttribute("RulesData").split("#")[3].split(';')[1].split(",")
+    var ExceptionOrderArrayC = BasicData.getAttribute("RulesData").split("#")[3].split(';')[2].split(",")
+    var SearchForExceptions = true
+    var Gender = BasicData.getAttribute("GenderCode")
+	//معاهد فني توزيع جغرافي 46,56,57,62,69
+	if (Spec == 46 ){
+		UnivOrderArray[0] = "0160"
+		ExceptionOrderArrayA = []
+		ExceptionOrderArrayB = []
+		ExceptionOrderArrayC = []
+	}	
+	else if (Spec == 57){
+		UnivOrderArray[0] = "0170"
+		ExceptionOrderArrayA = []
+		ExceptionOrderArrayB = []
+		ExceptionOrderArrayC = []
+	} 
+	else if (Spec == 56) {
+	    UnivOrderArray[0] = "0180"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	} else if (Spec == 62) {
+	    UnivOrderArray[0] = "0190"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	} else if (Spec == 69) {
+	    UnivOrderArray[0] = "0191"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	} 
+//* a new added conditions for geographic distribution of paid inistitutes
+else if (Spec == 68) {
+	    UnivOrderArray[0] = "0150"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	
+	else if (Spec == 70) {
+	    UnivOrderArray[0] = "0151"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	else if (Spec == 66) {
+	    UnivOrderArray[0] = "0152"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	else if (Spec == 92) {
+	    UnivOrderArray[0] = "0153"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	else if (Spec == 42) {
+	    UnivOrderArray[0] = "0154"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	else if (Spec == 60) {
+	    UnivOrderArray[0] = "0155"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	else if (Spec == 44) {
+	    UnivOrderArray[0] = "0156"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	else if (Spec == 81) {
+	    UnivOrderArray[0] = "0157"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	else if (Spec == 93) {
+	    UnivOrderArray[0] = "0158"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	else if (Spec == 78) {
+	    UnivOrderArray[0] = "0159"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	else if (Spec == 58) {
+	    UnivOrderArray[0] = "0161"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+else if (Spec == 48) {
+	    UnivOrderArray[0] = "0162"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+else if (Spec == 55) {
+	    UnivOrderArray[0] = "0163"
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+else if (Spec == 94) {
+	    if(BasicData.getAttribute("ZoneCode")==1||BasicData.getAttribute("ZoneCode")==21)
+			UnivOrderArray[0] = "037"
+		if(BasicData.getAttribute("ZoneCode")==22)
+			UnivOrderArray[0] = "036"
+		if(BasicData.getAttribute("ZoneCode")==17)
+			UnivOrderArray[0] = "035"
+		
+	    ExceptionOrderArrayA = []
+	    ExceptionOrderArrayB = []
+	    ExceptionOrderArrayC = []
+	}
+	var Faculties=new Array()
+	var i;
+	var j
+	if (Precedance==1000) {//Calculating must faculties  (A and B ) for group C faculties
+
+		for(i=0; i<UnivOrderArray.length;i++)
+		{
+		    DeptObligatoryUniv = Number(UnivOrderArray[i])
+		    var UnivFacs  =''
+		    if (DeptObligatoryUniv > 0)
+		        UnivFacs = DataDoc.getElementById("Universities" + UnivIds[DeptObligatoryUniv]).getAttribute("Faculties");
+			
+		    UFacs=UnivFacs.split(",")
+			for(j=1;j< UFacs.length-1;j++){ 
+				
+				if (FacultySpec(UFacs[j])==Spec && FacultyOrder(UFacs[j])>=0 && FacultyOrder(UFacs[j])!=1000) {
+					Faculties.push(UFacs[j]) 
+				}
+			}
+		}
+		/** newly added , Before addition it was calculating B exceptions only **/
+        for(j=1;j<ExceptionOrderArrayA.length-1;j++){ //exceptions in group A
+            var expFaculty = DataDoc.getElementById("Faculties"+ ExceptionOrderArrayA[j] )
+            if( expFaculty != null){
+                
+                if((expFaculty.getAttribute("GC") == Gender||eval(expFaculty.getAttribute("GC")) ==0) && expFaculty.getAttribute("SC") == Spec && !ExceedLimit(expFaculty.getAttribute("Code")) && CanFacultyBeShown(expFaculty,BasicData)){ 
+                    Faculties.push(expFaculty.getAttribute("Code"))
+                }
+            }
+        }
+        /****/
+		for(j=1;j<ExceptionOrderArrayB.length-1;j++){// exceptions in Group B
+		    var expFaculty = DataDoc.getElementById("Faculties" + ExceptionOrderArrayB[j])
+	        if( expFaculty != null){
+	            if ((expFaculty.getAttribute("GC") == Gender||eval(expFaculty.getAttribute("GC")) ==0) && expFaculty.getAttribute("SC") == Spec && !ExceedLimit(expFaculty.getAttribute("Code")) && CanFacultyBeShown(expFaculty, BasicData)) {
+	                Faculties.push(expFaculty.getAttribute("Code"))
+	            }
+	        }
+	    }
+	}
+	else //Calculating must faculties  (A) for group B faculties
+	{
+		for(i=0; i<UnivOrderArray.length;i++)
+		{
+			if ((UnivOrderArray[i]).indexOf("0") == 0){  
+				DeptObligatoryUniv = Number(UnivOrderArray[i])
+				var UnivFacs = DataDoc.getElementById("Universities" + UnivIds[DeptObligatoryUniv]).getAttribute("Faculties");
+				UFacs=UnivFacs.split(",")
+				for(j=1;j< UFacs.length-1;j++){ 
+					if (FacultyOrder(UFacs[j])==0 && FacultySpec(UFacs[j])==Spec ){//&& !ExceedLimit(expFaculty.Code)) {
+							Faculties.push(UFacs[j]) 
+					}
+				}
+			}
+		}
+		for(j=1;j<ExceptionOrderArrayA.length-1;j++){ // exceptions in group A
+		    var expFaculty = DataDoc.getElementById("Faculties" + ExceptionOrderArrayA[j])
+	        if( expFaculty != null){
+	            if ((expFaculty.getAttribute("GC") == Gender||eval(expFaculty.getAttribute("GC")) ==0) && expFaculty.getAttribute("SC") == Spec && !ExceedLimit(expFaculty.getAttribute("Code"))) {
+	                Faculties.push(expFaculty.getAttribute("Code"))
+	            }
+	        }
+	    }
+	}
+
+	return Faculties
+}
+
+
+
+function IsZoneRuleCorrect(Spec, FacultyCode, ChoiceNumber, ZoneCode)
+{
+    var StudentService = CurrentStudentService()
+    if (StudentService == "Transfer")
+        return true;
+	FacOrder = FacultyOrder(FacultyCode)
+	if (FacultyCode<0)
+		{
+		return true;
+		}
+	switch(eval(FacOrder)){
+		case 0 :
+			{
+				return true;
+			}
+		case -1 :
+			{
+				return true;
+			}
+		case 1000 : 
+	
+			{
+			
+			var MustFaculties =ZonesSepcializationFacultyOrder(Spec,1000)
+			
+			for(i=0; i<ChoiceNumber; i++){
+				var j
+					for(j=MustFaculties.length-1; j>=0; j--){
+						if(MustFaculties[j]==Choices(i).getAttribute("FacultyCode")){
+							MustFaculties = MustFaculties.slice(0,j).concat(MustFaculties.slice(j+1))
+						}
+					}
+				}
+			return(MustFaculties.length==0)
+			}
+		default:
+			{
+			
+			var MustFaculties =ZonesSepcializationFacultyOrder(Spec,1)
+			for(i=0; i<ChoiceNumber; i++){
+				var j
+					for(j=MustFaculties.length-1; j>=0; j--){
+						if(MustFaculties[j]==Choices(i).getAttribute("FacultyCode")){
+							
+							MustFaculties = MustFaculties.slice(0,j).concat(MustFaculties.slice(j+1))
+						}
+					}
+				}
+
+			return(MustFaculties.length==0)
+			}
+	} 
+}
+
+
+function BecameCorrect(Spec, ChoiceNumber, ZoneCode)
+{
+	Choices(ChoiceNumber).Correct = true;
+	
+	
+	if(ZoneCode>0)	
+	{
+		var i;
+		for(i=ChoiceNumber+1; i<ChoicesLimit; i++)
+			if(ChoiceSpec(i)==Spec)
+			{
+				if(IsZoneRuleCorrect(Spec, Choices(i).getAttribute("FacultyCode"), i, ZoneCode))
+				{
+					Choices(i).Correct = true;
+					Push(i);
+				}
+			}
+	}
+ }
+
+function BecameIncorrect(Spec, ChoiceNumber, ZoneCode)
+{
+	Choices(ChoiceNumber).Correct = false; 
+
+	
+	var i;
+	for(i=ChoiceNumber+1; i<ChoicesLimit; i++)
+		if(ChoiceSpec(i)==Spec)
+		{
+		
+			if(!IsZoneRuleCorrect(Spec, Choices(i).getAttribute("FacultyCode"), i, ZoneCode))
+			{
+				Choices(i).Correct = false;
+				Push(i);
+			}
+		} 
+}
+
+function UpdateSpecState(Spec, ChoiceNumber, ZoneCode, OldState, NewState)
+{
+
+		if(NewState && !OldState)
+			BecameCorrect(Spec, ChoiceNumber, ZoneCode);
+		else if (!NewState)
+			BecameIncorrect(Spec, ChoiceNumber, ZoneCode);
+}
+
+
+function ApplyZoneRules(Spec, FacultyCode, ChoiceNumber, ZoneCode, OldSpec, OldState)
+{
+	var State;	
+	if(Spec==OldSpec)
+	{
+		State = IsZoneRuleCorrect(Spec, FacultyCode, ChoiceNumber,ZoneCode);
+		UpdateSpecState(Spec, ChoiceNumber, ZoneCode, OldState, State);
+	}
+	else
+	{
+		if(OldSpec!=-1)			
+		{
+			UpdateSpecState(OldSpec, ChoiceNumber, ZoneCode, OldState, false);
+		
+		}
+
+		if(Spec!=-1)
+		{
+			State = IsZoneRuleCorrect(Spec, FacultyCode, ChoiceNumber,ZoneCode);
+			UpdateSpecState(Spec, ChoiceNumber, ZoneCode, false, State);
+		}
+	}	
+}
+
+function IsChoiceRepeated(FacultyCode, ChoiceNumber)
+{
+	var i; 
+	for(i=0; i<ChoicesLimit; i++)
+		if(FacultyCode==Choices(i).getAttribute("FacultyCode") && ChoiceNumber!=i)
+		{
+			return true;
+		}
+	return false;
+}
+
+function ExceedLimit(FacultyCode)
+{	
+	
+	var FacultyLimit = eval(DataDoc.getElementById("Faculties" + FacultyCode).getAttribute("L"));
+	var StudentTotalMark = eval(BasicData.getAttribute("TotalMarks"));
+	var Certificate = getParameterByName("Certificate");
+	switch (eval(Certificate)) {
+	    case 1:
+	        StudentTotalMark = parseFloat(StudentTotalMark) * 10
+	        break;
+	    case 2:
+	        StudentTotalMark = parseFloat(StudentTotalMark) *10/100
+	        break;
+	    case 3:
+	        /*get student total mark for the faculty specization*/
+	        var Faculty = DataDoc.getElementById("Faculties" + FacultyCode)
+			var markType=1;
+			if (Faculty.getAttribute("SG")) markType=eval(Faculty.getAttribute("SG"));
+		
+	        var StudentTotalMark = eval(BasicData.getAttribute("Sector").split('.')[markType-1])
+	        break;
+	    case 5:
+	        var Faculty = DataDoc.getElementById("Faculties" + FacultyCode)
+			var markType=1;
+			if (Faculty.getAttribute("SG")) markType=eval(Faculty.getAttribute("SG"));
+			
+	        var StudentTotalMark = eval(BasicData.getAttribute("Sector").split('.')[markType-1])
+	        break;
+	    default:
+	        break;
+	}
+    /* if student total mark for the specialization is above faculty limit for the certificate then return true else return false*/
+
+    if (StudentTotalMark < FacultyLimit)
+        return true;
+    else
+        return false;
+}
+
+function CheckUponPlot()
+{
+	for(i=0; i<ChoicesLimit; i++)
+	{
+		if(!IsZoneRuleCorrect(FacultySpec(Choices(i).getAttribute("FacultyCode")), Choices(i).getAttribute("FacultyCode"), i, 0))
+		{
+			Choices(i).Correct = false;
+			Push(i);
+		}
+
+	} 
+	UpdateChoicesView()
+	for (i=1; i<ChoicesLimit-1;i++)
+		{
+		    if (Choices2Doc.getElementById("Notes" + i).innerHTML.indexOf("خطأ") >= 0)
+			{
+			alert("لديك أخطاء في التوزيع الجغرافي و لن يتم قبول رغباتك بالموقع إلا بعد تصحيح الأخطاء وطباعة إيصال جديد")
+			return;
+			}
+		}
+}
+function IsValidChoice(FacultyCode, ChoiceNumber, ZoneCode)
+{
+	Push(ChoiceNumber);
+	if(eval(FacultyCode)>=0)
+	{
+		if(IsChoiceRepeated(FacultyCode))
+		{
+			return ChoiceError_AlreadySelected;
+		}
+
+		
+		
+	/*	if(ExceedLimit(FacultyCode, ChoiceNumber))
+		{
+			
+			return ChoiceError_ExceedLimit;
+		}*/
+		var CapErr=false;
+
+		switch(CheckSpecialRules(Faculty(FacultyCode), BasicData))
+		{			
+			case -1:
+			{
+				CapErr = true;
+				break;
+			}
+			case 2:
+			    CapErr = true;
+			    alert("يجب عليك اجتياز اختبار القدرات")
+			    break;
+			case 0:
+				alert("شروط خاصــة\n\n" + DataDoc.getElementById("SpecialRules" + Faculty(FacultyCode).getAttribute("C")).getAttribute("Description"))
+				break;
+            case 3:
+				break;
+			case 4:
+				return ChoiceError_TransferPrevented;
+				break;
+			return ChoiceError_Capabilities;
+
+		}
+		
+	}	
+
+	var Spec = FacultySpec(FacultyCode);
+	var OldSpec = ChoiceSpec(ChoiceNumber);
+	var OldState = Choices(ChoiceNumber).Correct;
+	Choices(ChoiceNumber).setAttribute("FacultyCode", FacultyCode);
+	var Order = FacultyOrder(FacultyCode);
+	
+
+	ApplyZoneRules(Spec, FacultyCode, ChoiceNumber, ZoneCode, OldSpec, OldState);
+	if(FacultyCode<0)
+		Choices(ChoiceNumber).Correct = false;
+	else		
+		if(!Choices(ChoiceNumber).Correct)
+			
+			return ChoiceError_ZoneRestrictedLocation;
+	if(CapErr)
+		return ChoiceError_Capabilities;
+	return ChoiceError_None;
+
+}
+
+function UpdateChoicesView()
+{
+	var i;
+	i=Pop();
+	while(i>=0)
+	{
+	    if (Choices(i).getAttribute("FacultyCode") == -1 || Choices(i).getAttribute("FacultyCode") == 999)
+		{
+		    Choices2Doc.getElementById("FacultyName" + i).innerHTML = "<p></p>";
+		    //Choices2Doc.getElementById("FacultyName" + i).textContent = " ";
+		    Choices2Doc.getElementById("Notes" + i).innerHTML = "<p></p>";
+		    //Choices2Doc.getElementById("Notes" + i).textContent = " ";
+			Choices2Doc.getElementById("Notes" + i).bgColor = ChoiceErrorColors[ChoiceError_None];	
+		}
+		else 
+		{ 
+		    try {
+		         if ((",61,78,44,70,81,68,59,62,47,42,60,66,91,92,93,99,51,").indexOf("," + Faculty(Choices(i).getAttribute("FacultyCode")).getAttribute("SC") + ",") >= 0 && getParameterByName("Certificate")!= 4)
+		         {//**كتابة أكواد المعاهد
+		             Choices2Doc.getElementById("FacultyName" + i).innerHTML = "<p>"+ Choices(i).getAttribute("FacultyCode") + "-" + Faculty(Choices(i).getAttribute("FacultyCode")).getAttribute("Name") + " </p>";
+		         }
+		         else
+		         {
+		            Choices2Doc.getElementById("FacultyName" + i).innerHTML ="<p>" + Faculty(Choices(i).getAttribute("FacultyCode")).getAttribute("Name") + " </p>";	        
+		         }
+		    } catch (e) {
+		        alert("كود الكلية به خطأ ، تواصل مع إدارة الموقع 19468 بالرقم  "+ i)
+		    }
+    		if(Choices(i).Correct)
+    		{
+                //alert(i)
+			    if (Faculty(Choices(i).getAttribute("FacultyCode")).getAttribute("N")) {
+                    Choices2Doc.getElementById("Notes" + i).innerHTML = "<p>" + Faculty(Choices(i).getAttribute("FacultyCode")).getAttribute("N") + " </p>";
+			    } else {
+			        Choices2Doc.getElementById("Notes" + i).innerHTML = "<p></p>";
+			    }
+			        Choices2Doc.getElementById("Notes" + i).bgColor = ChoiceErrorColors[ChoiceError_None];	
+
+			}
+			else
+			{
+			    if (DataDoc.getElementById("Specializations" + DataDoc.getElementById("Faculties" + Choices(i).getAttribute("FacultyCode")).getAttribute("SC")).getAttribute("InstitutionType") == "1")
+			        Choices2Doc.getElementById("Notes" + i).innerHTML = "<p>" + ChoiceErrors[ChoiceError_ZoneRestrictedLocation] + "<p>";
+			    else
+			        Choices2Doc.getElementById("Notes" + i).innerHTML = "<p>" + ChoiceErrors[ChoiceError_ZoneRestrictedLocation+5] + "<p>";
+			    
+			    Choices2Doc.getElementById("Notes" + i).bgColor = ChoiceErrorColors[ChoiceError_ZoneRestrictedLocation];	
+			}
+		}		
+		i=Pop();
+	}
+}
+
+
+
+function ModifyChoice(FacultyCode, ChoiceNumber, ZoneCode, UpdateView)
+{
+	
+	var ChoiceError = IsValidChoice(FacultyCode, ChoiceNumber, ZoneCode);
+	switch(ChoiceError)
+	{
+		case ChoiceError_Incomplete:
+		case ChoiceError_AlreadySelected:
+			alert(ChoiceErrorMessages[ChoiceError]);
+			return false
+		case ChoiceError_TransferPrevented:
+			alert(ChoiceErrorMessages[ChoiceError]);
+			return false
+		case ChoiceError_ExceedLimit:
+			alert(ChoiceErrorMessages[ChoiceError]);
+		case ChoiceError_SpecialConditions:
+			return false
+		case ChoiceError_Capabilities:
+		    alert(ChoiceErrorMessages[ChoiceError]);
+			if (DataDoc.getElementById("Faculties" + FacultyCode).getAttribute("N").indexOf(ChoiceErrorMessages[ChoiceError])<0)
+				DataDoc.getElementById("Faculties" + FacultyCode).setAttribute("N", DataDoc.getElementById("Faculties" + FacultyCode).getAttribute("N")+"و "+ ChoiceErrorMessages[ChoiceError]);
+			if(UpdateView)
+				UpdateChoicesView();
+			break;
+	    case ChoiceError_ZoneRestrictedLocation:
+			if(UpdateView)
+			{
+                if(DataDoc.getElementById("Specializations" + DataDoc.getElementById("Faculties" + FacultyCode).getAttribute("SC")).getAttribute("InstitutionType")== "1")
+		            alert(ChoiceErrorMessages[ChoiceError]);
+		        else
+		            alert(ChoiceErrorMessages[ChoiceError+6]);
+			}
+		default:
+		{
+			if(UpdateView)
+				UpdateChoicesView();
+		}
+	}
+	
+	return true;
+}
+
+
+
+function InsertChoiceAt(FacultyCode, ChoiceNumber,ZoneCode)
+{
+	var LastFaculty = Choices(ChoicesLimit-1).getAttribute("FacultyCode");
+	var LastCorrect = Choices(ChoicesLimit-1).Correct;
+	
+	
+	var i;
+	for(i=ChoicesLimit-1; i>ChoiceNumber;i--)
+	{
+		Choices(i).setAttribute("FacultyCode",Choices(i-1).getAttribute("FacultyCode"));
+		Choices(i).Correct = Choices(i-1).Correct;
+		Push(i);
+	} 
+	
+	Choices(ChoiceNumber).setAttribute("FacultyCode",-1);
+	Choices(ChoiceNumber).Correct=false;
+	
+	if(!ModifyChoice(FacultyCode, ChoiceNumber,ZoneCode, true))
+	{
+		for(i=ChoiceNumber;i<ChoicesLimit-1;i++)
+		{
+			Choices(i).setAttribute("FacultyCode", Choices(i+1).getAttribute("FacultyCode"));
+			Choices(i).Correct = Choices(i+1).Correct;
+			Pop();
+		}
+		
+		Choices(ChoicesLimit - 1).setAttribute("FacultyCode", LastFaculty);
+		Choices(ChoicesLimit-1).Correct = LastCorrect;
+	}
+}
+
+function ReplaceChoice(NewFacultyCode, ChoiceNumber, ZoneCode)
+{
+    var OldFacultyCode;
+	
+	OldFacultyCode = Choices(ChoiceNumber).getAttribute("FacultyCode")
+
+	ModifyChoice(-1, ChoiceNumber, ZoneCode, false)
+
+	if(!ModifyChoice(NewFacultyCode, ChoiceNumber, ZoneCode, true))
+	{
+		ModifyChoice(OldFacultyCode, ChoiceNumber, ZoneCode, false)
+	}
+		
+}
+
+function DeleteChoice(ChoiceNumber, ZoneCode)
+{
+	var OldFacultySpec
+	OldFacultySpec = ChoiceSpec(ChoiceNumber)
+	
+	
+	
+	ModifyChoice(-1,ChoiceNumber, ZoneCode, false);
+	
+	
+	var i;
+	for(i=ChoiceNumber; i<ChoicesLimit-1;i++)
+	{
+		Choices(i).setAttribute("FacultyCode",Choices(i+1).getAttribute("FacultyCode"));
+		Choices(i).Correct = Choices(i+1).Correct;
+		Push(i);		
+	}
+	Choices(ChoicesLimit-1).setAttribute("FacultyCode",-1);
+	Choices(ChoicesLimit-1).Correct=false;
+	Push(ChoicesLimit-1);
+
+	UpdateChoicesView();
+		
+}
+
+function MoveUpChoice(ChoiceNumber, ZoneCode)
+{
+	if(ChoiceNumber>0)
+	{
+		var OldFacultyCode = Choices(ChoiceNumber-1).getAttribute("FacultyCode");
+		var OldCorrect = Choices(ChoiceNumber-1).Correct;
+
+		var FacultyCode = Choices(ChoiceNumber).getAttribute("FacultyCode");
+		var Correct = Choices(ChoiceNumber).Correct;
+		
+		if(FacultySpec(FacultyCode)==FacultySpec(OldFacultyCode) && FacultyCode!=-1)
+		{
+			Choices(ChoiceNumber-1).setAttribute("FacultyCode", -1);
+			Choices(ChoiceNumber-1).Correct = false;
+			
+			Choices(ChoiceNumber).setAttribute("FacultyCode", -1);
+			Choices(ChoiceNumber).Correct = false;
+			
+			var e1 = IsValidChoice(FacultyCode, ChoiceNumber-1, ZoneCode);
+			
+			var e2 = IsValidChoice(OldFacultyCode, ChoiceNumber, ZoneCode);
+			
+			if(e1==ChoiceError_ZoneRestrictedLocation || e2==ChoiceError_ZoneRestrictedLocation)
+			    if (DataDoc.getElementById("Specializations" + DataDoc.getElementById("Faculties" + FacultyCode).getAttribute("SC")).getAttribute("InstitutionType") == "1")
+			        alert(ChoiceErrorMessages[ChoiceError_ZoneRestrictedLocation]);
+			    else
+			        alert(ChoiceErrorMessages[ChoiceError_ZoneRestrictedLocation+5]);
+				
+				
+		}		
+		else
+		{
+			Choices(ChoiceNumber-1).setAttribute("FacultyCode", FacultyCode);;
+			Choices(ChoiceNumber-1).Correct = Correct;
+			
+			Choices(ChoiceNumber).setAttribute("FacultyCode", OldFacultyCode);
+			Choices(ChoiceNumber).Correct = OldCorrect;
+		}
+		
+		Push(ChoiceNumber-1);
+		Push(ChoiceNumber);
+
+		UpdateChoicesView();
+	}
+}
+
+function InsertCancelChoice() {
+
+    Choices(0).setAttribute("FacultyCode", 2000);
+    Choices(0).Correct = true;
+    Choices2Doc.getElementById("FacultyName" + 0).innerHTML = "<p>أرغب في إلغاء الطلب</p>";
+    //Choices2Doc.getElementById("FacultyName" + i).textContent = " ";
+    Choices2Doc.getElementById("Notes" + 0).innerHTML = "<p>تابع التسجيل وأصدر إيصال جديد</p>";
+    var node = DataDoc.getElementById("Specializations17").cloneNode(true);
+    node.setAttribute("id", "Faculties2000");
+    node.setAttribute("Name", "أرغب في إلغاء الطلب");
+    node.setAttribute("Code", 2000)
+    node.setAttribute("Order", -1)
+    node.setAttribute("D", ",0,");
+    node.setAttribute("Z", ",0,");
+    node.setAttribute("GC", "0");
+    node.setAttribute("L", "0");
+    node.setAttribute("C", "0");
+    node.setAttribute("DT", "0");
+    node.setAttribute("SC", "0");
+    node.setAttribute("E", "");
+    node.setAttribute("N", "تابع التسجيل وأصدر إيصال جديد");
+    try {
+        DataDoc.appendChild(node);  
+    } catch (e) {
+
+    }
+    try {
+        DataDoc.getElementById("Specializations17").appendChild(node);
+    } catch (e) {
+    }
+}
+
+function SetSelection(NewSelection)
+{
+	Choices2Doc.getElementById("selectButton"+NewSelection).focus();
+	
+
+}
+
+function sortByName(obj1, obj2){
+	if(obj1.getAttribute("Name")==obj2.getAttribute("Name"))
+		return 0
+	else if(obj1.getAttribute("Name")>obj2.getAttribute("Name"))
+		return 1
+	else return -1
+}
+function sortByCode(obj1, obj2){
+	
+	if(parseInt(obj1.getAttribute("Code"))==parseInt(obj2.getAttribute("Code")))
+		return 0
+	else if(parseInt(obj1.getAttribute("Code"))>parseInt(obj2.getAttribute("Code")))
+		return 1
+	else return -1
+}
+
+function sortByLocation(obj1, obj2){
+	if ((",1,21,").indexOf(","+BasicData.getAttribute("ZoneCode")+",")>=0 &&  (",1,21,").indexOf(","+obj1.getAttribute("LC")+",")>=0 )
+			return -1
+	
+	if (BasicData.getAttribute("ZoneCode") == parseInt(obj1.getAttribute("LC")) )
+			return -1
+	if (BasicData.getAttribute("ZoneCode") == parseInt(obj1.getAttribute("LC")) && BasicData.getAttribute("ZoneCode") == parseInt(obj2.getAttribute("LC")) )
+			return 0
+	//else if (BasicData.getAttribute("ZoneCode") == parseInt(obj2.getAttribute("LC")))
+		//return 0
+	else return 1
+}		
+		
+function sortByLimit(obj1, obj2) {
+    if (obj1.getAttribute("Limit") == obj2.getAttribute("Limit"))
+        return 0
+    else if (obj1.getAttribute("Limit") < obj2.getAttribute("Limit"))
+        return 1
+    else return -1
+}
+
+
+function sortByOrder(obj1, obj2) {
+	//if(eval(obj1.getAttribute("Order"))==-1 ||eval(obj2.getAttribute("Order"))==-1)
+		//	return 
+	if(eval(obj1.getAttribute("Order"))==eval(obj2.getAttribute("Order")))
+	    return sortByName(obj1, obj2);
+	else if(eval(obj1.getAttribute("Order")) > eval(obj2.getAttribute("Order")))
+		return 1
+	else return -1
+}	
+
+function FillLocationCombo(selectedSpec, selectedFaculty){
+
+    Choices1Doc.getElementById("Location");
+    switch (StudentService) {
+        case "Apply":
+            cboLocation = Choices1Doc.getElementById("Location");
+            break;
+        case "Transfer":
+            cboLocation = Choices1Doc.getElementById("TransferLocation");
+            break;
+        default:
+            break;
+    }
+    ClearCombo(cboLocation);
+
+	if(selectedSpec<0)	
+	{
+		AddItem(cboLocation, "--------------اختر التخصص أولا--------------", -1, -1);
+	}
+	else
+	{
+		AddItem(cboLocation, "------------------مكان غير محدد-------------------", -1, selectedFaculty);
+		var i;
+		
+		var thisSpecialization = DataDoc.getElementById("Specializations" + selectedSpec);
+		var SpecFaculties =	thisSpecialization.getAttribute("Faculties").split(",")
+		SpecFaculties=SpecFaculties.slice(1,SpecFaculties.length-1)
+		for(i=0; i<SpecFaculties.length; i++)
+			{SpecFaculties[i] = DataDoc.getElementById("Faculties"+SpecFaculties[i])}
+	if (thisSpecialization.getAttribute("InstitutionType")==1 || ((",46,56,57,62,69,").indexOf(","+selectedSpec+",") >=0))
+			SpecFaculties.sort(sortByOrder)
+		else
+			SpecFaculties.sort(sortByLocation)
+		
+		
+		for(i=0; i<SpecFaculties.length; i++)
+		{
+			
+		    switch (StudentService) {
+
+		        case "Apply":
+
+		            var Faculty = SpecFaculties[i];
+		            if (Faculty.getAttribute("Order") == 0) {
+		                AddItem(cboLocation, "(أ)" + Faculty.getAttribute("Name"), Faculty.getAttribute("id").substring(9), selectedFaculty)
+		            } else if (Faculty.getAttribute("Order") == -1) {
+		                AddItem(cboLocation,  Faculty.getAttribute("Name"), Faculty.getAttribute("id").substring(9), selectedFaculty)
+		            }else if (Faculty.getAttribute("Order") == 1000) {
+		                    AddItem(cboLocation, "(ج)" + Faculty.getAttribute("Name"), Faculty.getAttribute("id").substring(9), selectedFaculty)
+		                }
+					
+		                else
+		                    AddItem(cboLocation, "(ب)" + Faculty.getAttribute("Name"), Faculty.getAttribute("id").substring(9), selectedFaculty)
+		            break;
+		        case "Transfer":
+		            var Faculty = SpecFaculties[i];
+		            if (TransferType == 2) {
+		                if (Faculty.getAttribute("Order") == 0) {
+		                    AddItem(cboLocation, "(أ)" + Faculty.getAttribute("Name"), Faculty.getAttribute("id").substring(9), selectedFaculty)
+		                } else if (Faculty.getAttribute("Order") == -1) {
+		                    AddItem(cboLocation, Faculty.getAttribute("Name"), Faculty.getAttribute("id").substring(9), selectedFaculty)
+		                }
+		            }
+		            var Faculty = SpecFaculties[i];
+		            if (TransferType == 4) {
+		                if (Faculty.getAttribute("Order") > 0 && Faculty.getAttribute("Order") !=1000 ) {
+		                    AddItem(cboLocation, "(ب)" + Faculty.getAttribute("Name"), Faculty.getAttribute("id").substring(9), selectedFaculty)
+		                } else if (Faculty.getAttribute("Order") == 1000) {
+		                    AddItem(cboLocation, "(ج)" + Faculty.getAttribute("Name"), Faculty.getAttribute("id").substring(9), selectedFaculty)
+		                }
+		            }
+		            var Faculty = SpecFaculties[i];
+		            if (TransferType == 5) {
+		                if ((Faculty.getAttribute("Order") != 1000) || (Faculty.getAttribute("Order") == -1)) {
+		                   
+		                    AddItem(cboLocation, Faculty.getAttribute("Name"), Faculty.getAttribute("id").substring(9), selectedFaculty)
+		                }
+		            }
+		            break;
+
+		    }
+		   
+		}
+		cboLocation.selectedIndex = 0;
+	}
+}
+
+function FillLocationComboWithFaculties(selectedSpec, facultiesList) {
+
+    Choices1Doc.getElementById("Location");
+    cboLocation = Choices1Doc.getElementById("TransferLocation");
+    ClearCombo(cboLocation);
+
+    if (selectedSpec < 0) {
+        AddItem(cboLocation, "--------------اختر التخصص أولا--------------", -1, -1);
+    }
+    else {
+        AddItem(cboLocation, "------------------مكان غير محدد-------------------", -1, -1);
+        var i;
+
+       // var thisSpecialization = DataDoc.getElementById("Specializations" + selectedSpec);
+        var SpecFaculties = facultiesList.split(",")
+        //SpecFaculties = SpecFaculties.slice(1, SpecFaculties.length - 1)
+        for (i = 0; i < SpecFaculties.length; i++)
+        {
+            if (SpecFaculties[i] > 0 && parseInt(SpecFaculties[i]) != parseInt(BasicData.getAttribute("CurrentAcceptedFaculty"))) {
+             try{   var Faculty = DataDoc.getElementById("Faculties" + SpecFaculties[i])
+                Faculty.setAttribute("L", 0);
+                AddItem(cboLocation, Faculty.getAttribute("Name"), Faculty.getAttribute("id").substring(9), -1)
+            } catch (e) {
+            }
+            }
+        }
+    }
+}
+
+function FillUniversitiesCombo()
+{
+	var cboUniversities = Choices1Doc.getElementById("Universities");
+	
+	var Universities = new Array()
+	var i;
+	for (i = 0; i < DataDoc.getElementById("Universities").getAttribute("length"); i++)
+	    Universities[i] = DataDoc.getElementById("Universities" + i);
+
+	Universities.sort(sortByName);
+	
+	for(i=0; i<Universities.length; i++)
+	{
+		UniversityId = new String(Universities[i].getAttribute("id"));
+		UniversityId = UniversityId.substr(12, UniversityId.length-12);
+			
+		AddItem(cboUniversities, Universities[i].getAttribute("Name"), UniversityId, -1);
+	}
+}
+
+function FillFacultiesCombo(selectedUniv,SubjectSet)
+{
+    var cboFaculties = Choices1Doc.getElementById("UniversityFacuties");
+	
+	ClearCombo(cboFaculties);
+	
+	if(selectedUniv<0)	
+	{
+		AddItem(cboFaculties, "---------------اختر الجامعة اولاَ-------------", -1, -1);
+	}
+	else
+	{		
+	
+		AddItem(cboFaculties, "------------------مكان غير محدد-------------------", -1, -1);
+		FillFacultiesCombo1(selectedUniv,SubjectSet)
+	}		
+	
+}
+function DecodeGenericStamp(FacultyCode)
+{
+    var Faculty = DataDoc.getElementById("Faculties" + FacultyCode)
+	if(Faculty.LocationCode==null){
+	   // FacultyCode = eval("DataDoc.getElementById('Zones'+ZoneIds[BasicData..getAttribute("Subjectsets")]).attributes('F'+FacultyCode)")
+	}
+	return FacultyCode;
+}
+
+function Choosen(FacultyCode)
+{
+	var i=0;
+	for(i=0; i<ChoicesLimit;i++)
+		if(Choices(i).getAttribute("FacultyCode")==FacultyCode)
+			return true
+	return false
+}
+
+function FillFacultiesCombo1(selectedUniv,SubjectSet)
+{
+	var cboFaculties = Choices1Doc.getElementById("UniversityFacuties");
+
+	var i;
+	cboFaculties.selectedIndex =0;
+	var UniversityFaculties=DataDoc.getElementById("Universities" + selectedUniv).getAttribute("Faculties");
+	var Faculties=UniversityFaculties.split(",")
+	Faculties=Faculties.slice(1,Faculties.length-1)
+	for(i=0; i<Faculties.length; i++)
+	{ Faculties[i] = DataDoc.getElementById("Faculties" + Faculties[i]) }
+	Faculties.sort(sortByOrder)
+	for(i=0;i<Faculties.length;i++)
+	{
+		var FacultyCode = eval(Faculties[i].id.substring(9));
+
+		{
+			var Faculty=Faculties[i]
+		    if (Faculty.getAttribute("Order")==0){
+			    AddItem(cboFaculties,"(أ)"+Faculty.getAttribute("Name"),FacultyCode,-1)
+		    }
+		    else if (Faculty.getAttribute("Order")==-1){
+		    AddItem(cboFaculties,Faculty.getAttribute("Name"),FacultyCode,-1)
+		    }
+		    else if (Faculty.getAttribute("Order")==1000){
+		    AddItem(cboFaculties,"(ج)"+Faculty.getAttribute("Name"),FacultyCode,-1)
+		    }
+		    else
+		    AddItem(cboFaculties,"(ب)"+Faculty.getAttribute("Name"),FacultyCode,-1)
+		}
+	}
+}
+
+function FillSpecializationCombo(selectedSpec)
+{
+	var cboSpecialization = Choices1Doc.getElementById("Specialization");
+	ClearCombo(cboSpecialization);
+	
+	AddItem(cboSpecialization, "-----------------اختر التخصص أولاً-----------------",-1, selectedSpec);
+	var SelectedSubjectset=BasicData.getAttribute("Subjectsets");
+	FillSpecializationCombo1(SelectedSubjectset, selectedSpec);
+}
+
+
+
+
+
+
+
+function FillSpecializationCombo1(SelectedSubjectset, selectedSpec)
+{
+	var cboSpecialization = Choices1Doc.getElementById("Specialization");
+	var i; 
+	SelectedSubjectset=eval(SelectedSubjectset)
+	if(SelectedSubjectset!=-1)
+	{
+	    //var Specializations = BasicData.getAttribute("RulesData").split("#")[6].split(",")
+		//Specializations = Specializations.slice(1,Specializations.length-1)
+	    var Specializations = new Array();
+	    for (i = 0; i < 100; i++) {
+	        if (Data.getElementById("Specializations"+i)!=null)
+	            Specializations[i] = Data.getElementById("Specializations" + i)
+	    }
+
+	    Specializations.sort(sortByName);
+		    
+		for(i=0; i<Specializations.length; i++)
+		{
+		    if( Specializations[i] !=null) {
+		        if (Specializations[i].getAttribute("Faculties") != ",") {
+		            AddItem(cboSpecialization, Specializations[i].getAttribute("Name"), Specializations[i].getAttribute("id").substring(15), selectedSpec);
+		        }
+		    }
+		}
+	}
+}
+//**Transfer
+
+function FillTransferSpecializationCombo1(TransferType, AcceptedSpecialization) {
+    var cboTransferSpecialization = Choices1Doc.getElementById("TransferSpecialization");
+    ClearCombo(cboTransferSpecialization)
+    switch (TransferType) {
+        case "Monazer":
+            //clear
+            if (Data.getElementById("Specializations" + AcceptedSpecialization) != null) {
+                if (Data.getElementById("Specializations" + AcceptedSpecialization).getAttribute("Faculties") != ",") {
+                    AddItem(cboTransferSpecialization, "--------------التخصص المناظر--------------", -1, -1);
+                    AddItem(cboTransferSpecialization, Data.getElementById("Specializations" + AcceptedSpecialization).getAttribute("Name"), Data.getElementById("Specializations" + AcceptedSpecialization).getAttribute("id").substring(15), -1);
+                    cboTransferSpecialization.selectedIndex = 1;
+			//FillLocationCombo(document.getElementById("TransferSpecialization").value, -1);
+                    
+                } else {
+                    //Message
+                    //AutoSelect NotMonazer
+                    //RecallFillTransferSpecCombo
+                }
+            }
+            break;
+        case "NotMonazer":
+            AddItem(cboTransferSpecialization, "-----------التخصصات الغير مناظرة-----------", -1, -1);
+            var Specializations = new Array();
+            for (i = 0; i < 100; i++) {
+                if (Data.getElementById("Specializations" + i) != null)
+                    Specializations[i] = Data.getElementById("Specializations" + i)
+            }
+            Specializations.sort(sortByName);
+            for (i = 0; i < Specializations.length; i++) {
+                if (Specializations[i] != null ) {
+                    if (Specializations[i].getAttribute("Faculties") != "," && Specializations[i].getAttribute("Faculties") != "" && (parseInt(Specializations[i].getAttribute("id").substring(15)) != parseInt(AcceptedSpecialization, 10)) && Specializations[i].getAttribute("InstitutionType") == 1) {
+                        //Find Order Zero
+                        var Zero = false;
+                        for (var j = 0; j < Specializations[i].getAttribute("Faculties").split(",").length ; j++) {
+                            try {
+                                if (DataDoc.getElementById("Faculties" + Specializations[i].getAttribute("Faculties").split(",")[j]).getAttribute("Order") == 0)
+                                    Zero = true;
+                            } catch (e) {
+
+                            }
+                        }
+                        if (Zero)
+                            AddItem(cboTransferSpecialization, Specializations[i].getAttribute("Name"), Specializations[i].getAttribute("id").substring(15), -1);
+                    }
+                }
+            }
+
+            break;
+        case "M3ahed":
+            AddItem(cboTransferSpecialization, "-----------تخصصات المعاهد-----------", -1, -1);
+            var Specializations = new Array();
+            for (i = 0; i < 100; i++) {
+                if (Data.getElementById("Specializations" + i) != null)
+                    if (Data.getElementById("Specializations" + i).getAttribute("Institutiontype") != "1")
+                        Specializations[i] = Data.getElementById("Specializations" + i)
+            }
+            Specializations.sort(sortByName);
+            for (i = 0; i < Specializations.length; i++) {
+                if (Specializations[i] != null) {
+                    if (Specializations[i].getAttribute("Faculties") != "," && Specializations[i].getAttribute("Faculties") != "" && Specializations[i].getAttribute("InstitutionType") !="1") {
+                            AddItem(cboTransferSpecialization, Specializations[i].getAttribute("Name"), Specializations[i].getAttribute("id").substring(15), -1);
+                    }
+                }
+            }
+
+            break;
+       /* case "Eltimas":
+            AddItem(cboTransferSpecialization, "-----------التماسات خارج المنطقة (أ)-----------", -1, -1);
+            var Specializations = new Array();
+            for (i = 0; i < 100; i++) {
+                if (Data.getElementById("Specializations" + i) != null)
+                    Specializations[i] = Data.getElementById("Specializations" + i)
+            }
+            Specializations.sort(sortByName);
+            for (i = 0; i < Specializations.length; i++) {
+                if (Specializations[i] != null) {
+                    if (Specializations[i].getAttribute("Faculties") != "," && Specializations[i].getAttribute("InstitutionType") == 1 && Specializations[i].getAttribute("DistributionType") == 1) {
+                        AddItem(cboTransferSpecialization, Specializations[i].getAttribute("Name"), Specializations[i].getAttribute("id").substring(15), -1);
+                    }
+                }
+            }*/
+        case "Cancel":
+            break;
+        default:
+            break;
+    }
+    Choices1Doc = window.parent.frames[0].document
+}
+
+
+function LoadChoice(ChoiceNumber)
+{
+    if (StudentService == "Apply") {
+        SelectComboItem(Choices1Doc.getElementById("Specialization"), ChoiceSpec(ChoiceNumber));
+        FillLocationCombo(Choices1Doc.getElementById("Specialization").value, -1);
+        SelectComboItem(Choices1Doc.getElementById("Location"), Choices(ChoiceNumber).getAttribute("FacultyCode"));
+    } else {
+        try {
+            SelectComboItem(Choices1Doc.getElementById("TransferSpecialization"), ChoiceSpec(ChoiceNumber));
+            FillLocationCombo(Choices1Doc.getElementById("TransferSpecialization").value, -1);
+            SelectComboItem(Choices1Doc.getElementById("TransferLocation"), Choices(ChoiceNumber).getAttribute("FacultyCode"));
+        } catch (e) {
+
+        }
+       
+
+    }
+	
+}
+
+function LoadUniversityChoice(ChoiceNumber)
+{
+	if(Choices(ChoiceNumber).getAttribute("FacultyCode")>-1)
+	{
+		var faccode=Choices(ChoiceNumber).getAttribute("FacultyCode")
+		var Univcode = DataDoc.getElementById("Faculties" + faccode).getAttribute("UC");
+		SelectComboItem(Choices1Doc.getElementById("Universities"), UnivIds[Univcode]);
+		var SubjectSet=BasicData.Subjectsets;
+		FillFacultiesCombo(Choices1Doc.getElementById("Universities").value, SubjectSet)
+		SelectComboItem(Choices1Doc.getElementById("UniversityFacuties"), faccode);
+	}
+	else
+	{
+	    SelectComboItem(Choices1Doc.getElementById("Universities"), -1);
+		FillFacultiesCombo(-1,-1)
+	}
+}
+
+function InitChoices(ChoiceNumber)
+{
+	var i;
+	for(i=0; i<ChoicesLimit; i++)
+		DataDoc.getElementById("Choices" + i).setAttribute("Correct") = false;
+}
+
+function GotoEmptyLocation()
+{
+	var i;
+	for(i=0; i<ChoicesLimit; i++)
+		if(Choices(i).getAttribute("FacultyCode")==-1)
+		{
+		    Choices1Doc.getElementById("ChoiceNumber").selectedIndex = i;
+		    Choices1Doc.getElementById("ChoiceNumber1").selectedIndex = i;
+
+		    if (Choices1Doc.getElementById("SelectbySpec").checked)
+		    {
+		        try
+		        {Choices1Doc.getElementById("Location").focus();}
+		        catch (e)
+		        { Choices1Doc.getElementById("TransferLocation").focus(); }
+		    }
+		    else
+		        Choices1Doc.getElementById("UniversityFacuties").focus();
+
+			Choices2Doc.getElementById("selectButton" + i).focus();
+			break;
+		}  
+	
+}
+
+function GotoEmptyLocationWithoutJump()
+{
+	var i;
+	for(i=0; i<ChoicesLimit; i++)
+		if(Choices(i).getAttribute("FacultyCode")==-1)
+		{	
+			Choices1Doc.getElementById("ChoiceNumber").selectedIndex = i;
+			Choices1Doc.getElementById("ChoiceNumber1").selectedIndex = i;
+
+			if (Choices1Doc.getElementById("SelectbySpec").checked)
+			    Choices1Doc.getElementById("Location").focus();	
+			else
+			    Choices1Doc.getElementById("UniversityFacuties").focus();
+			
+			break;
+		}  
+	
+}
+
+
+function ExportChoices()
+{
+	var i, url
+	url = ""
+	for(i=0; i<ChoicesLimit; i++)
+		url = url + "&cc=" + Choices(i).getAttribute("FacultyCode")
+
+	window.open("exportChoices.aspx?x=0"+url, "_blank")	
+}

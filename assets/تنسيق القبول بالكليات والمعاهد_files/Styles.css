@@ -1,0 +1,117 @@
+BODY {
+	BORDER-RIGHT: navy thin solid; BORDER-TOP: navy thin solid; FONT-WEIGHT: normal; FONT-SIZE: 12pt; WORD-SPACING: normal; TEXT-TRANSFORM: none; BORDER-LEFT: navy thin solid; BORDER-BOTTOM: navy thin solid; FONT-FAMILY: Verdana, Helvetica, sans-serif; LETTER-SPACING: normal; BACKGROUND-COLOR: #eeeeee;
+}
+H1 {
+	COLOR: #003366
+}
+H2 {
+	COLOR: #003366
+}
+H3 {
+	COLOR: #003366
+}
+H4 {
+	COLOR: #003366
+}
+H5 {
+	COLOR: #003366
+}
+TH {
+	COLOR: #003366
+}
+THEAD {
+	COLOR: #003366
+}
+TFOOT {
+	COLOR: #003366
+}
+H1 {
+	FONT-WEIGHT: 700; FONT-SIZE: 2em; WORD-SPACING: normal; TEXT-TRANSFORM: none; COLOR: white; FONT-STYLE: normal; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; LETTER-SPACING: normal; BACKGROUND-COLOR: navy; TEXT-DECORATION: none
+}
+H2 {
+	FONT-WEIGHT: 700; FONT-SIZE: 1.5em; WORD-SPACING: normal; TEXT-TRANSFORM: none; FONT-STYLE: normal; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; LETTER-SPACING: normal; TEXT-DECORATION: none
+}
+H3 {
+	FONT-WEIGHT: 500; FONT-SIZE: 1.58em; WORD-SPACING: normal; TEXT-TRANSFORM: none; FONT-STYLE: normal; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; LETTER-SPACING: normal; TEXT-DECORATION: none
+}
+H4 {
+	FONT-WEIGHT: 500; FONT-SIZE: 1.33em; WORD-SPACING: normal; TEXT-TRANSFORM: none; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; LETTER-SPACING: normal; TEXT-DECORATION: none
+}
+H5 {
+	FONT-WEIGHT: 700; FONT-SIZE: 1em; WORD-SPACING: normal; TEXT-TRANSFORM: none; FONT-STYLE: normal; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; LETTER-SPACING: normal; TEXT-DECORATION: none
+}
+DT {
+	FONT-WEIGHT: 700; FONT-SIZE: 1em; WORD-SPACING: normal; TEXT-TRANSFORM: none; FONT-STYLE: normal; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; LETTER-SPACING: normal; TEXT-DECORATION: none
+}
+H6 {
+	FONT-WEIGHT: 700; FONT-SIZE: 0.8em; WORD-SPACING: normal; TEXT-TRANSFORM: none; FONT-STYLE: normal; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; LETTER-SPACING: normal; TEXT-DECORATION: none
+}
+Warning {
+	FONT-WEIGHT: 700; FONT-SIZE: 0.8em; WORD-SPACING: normal; TEXT-TRANSFORM: none; COLOR: red; FONT-STYLE: normal; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; LETTER-SPACING: normal; TEXT-DECORATION: none
+}
+TFOOT {
+	FONT-SIZE: 1em; WORD-SPACING: normal; TEXT-TRANSFORM: none; FONT-FAMILY: Arial, Helvetica, sans-serif; LETTER-SPACING: normal
+}
+THEAD {
+	FONT-SIZE: 1em; WORD-SPACING: normal; TEXT-TRANSFORM: none; FONT-FAMILY: Arial, Helvetica, sans-serif; LETTER-SPACING: normal
+}
+TH {
+	FONT-WEIGHT: bold; FONT-SIZE: 1em; WORD-SPACING: normal; VERTICAL-ALIGN: baseline; TEXT-TRANSFORM: none; FONT-FAMILY: Arial, Helvetica, sans-serif; LETTER-SPACING: normal
+}
+A:link {
+	COLOR: #3333cc; TEXT-DECORATION: none
+}
+A:visited {
+	COLOR: #333399; TEXT-DECORATION: none
+}
+A:active {
+	COLOR: #333399; TEXT-DECORATION: none
+}
+A:hover {
+	COLOR: #3333cc; TEXT-DECORATION: underline
+}
+SMALL {
+	FONT-SIZE: 0.7em
+}
+BIG {
+	FONT-SIZE: 1.17em
+}
+BLOCKQUOTE {
+	FONT-FAMILY: Courier New, monospace
+}
+PRE {
+	FONT-FAMILY: Courier New, monospace
+}
+UL LI {
+	LIST-STYLE-TYPE: square
+}
+UL LI LI {
+	LIST-STYLE-TYPE: disc
+}
+UL LI LI LI {
+	LIST-STYLE-TYPE: circle
+}
+OL LI {
+	LIST-STYLE-TYPE: decimal
+}
+OL OL LI {
+	LIST-STYLE-TYPE: lower-alpha
+}
+OL OL OL LI {
+	LIST-STYLE-TYPE: lower-roman
+}
+IMG {
+	MARGIN-TOP: 5px; MARGIN-LEFT: 10px; MARGIN-RIGHT: 10px
+}
+.Labels {
+	FONT-SIZE: 16pt
+}
+.up {
+	BACKGROUND-IMAGE: url(images/up.gif); BACKGROUND-REPEAT: no-repeat
+}
+.down {
+	BACKGROUND-IMAGE: url(images/down.gif); BACKGROUND-REPEAT: no-repeat
+}
+.delete {
+	BACKGROUND-IMAGE: url(images/delete.gif); BACKGROUND-REPEAT: no-repeat
+}

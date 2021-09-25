@@ -1,0 +1,264 @@
+﻿//0	data
+//1	studentData
+//2	choicesData
+//3	header
+//4	main
+//5	checklist
+
+
+var Data;
+var DataDoc;
+var DataSource;
+var ComboDataSource;
+var StudentData;
+var ChoicesData;
+var BasicData;
+var _BasicData; //new for cross browser
+
+var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+// Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
+var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
+var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+// At least Safari 3+: "[object HTMLElementConstructor]"
+var isChrome = !!window.chrome && !isOpera;              // Chrome 1+
+var isIE = /*@cc_on!@*/false || !!document.documentMode; // At least IE6
+try{
+    var checklistElements = window.parent.parent.frames[5].document;
+} catch (e) {
+}
+
+function SetDataDocs()
+{
+
+
+
+	Data = window.parent.parent.frames[0].document;
+	DataDoc = window.parent.parent.frames[0].document;
+	DataSource = Data;
+	//ComboDataSource = Data;
+	ComboDataSource= window.parent.parent.frames[0].document//replacement
+	StudentData= window.parent.parent.frames[1].document;
+	//ChoicesData = window.parent.parent.frames[2].document.all;
+	ChoicesData = window.parent.parent.frames[2].document//replacement
+	//BasicData = StudentData.getElementById("BasicData")
+	BasicData = window.parent.parent.frames[1].document.getElementById("BasicData")//.getAttribute("ZoneCode")
+
+}
+
+function checkStep(step, status) {
+    checklistElements.getElementById("step" + step.toString()).className = status;
+}
+
+
+
+var Arabic = 0;
+var FirstLanguage =1;
+var SecondLanguage = 2;
+
+var ZoneIds = new Array(36);
+var UnivIds=new Array(25);
+
+
+
+
+var ChoiceError_None=0;
+var ChoiceError_AlreadySelected=1;
+var ChoiceError_ZoneRestrictedLocation=2;
+var ChoiceError_Incomplete=3;
+var ChoiceError_UnavailableSpecialization=4;
+var ChoiceError_SpecialConditions=5;
+var ChoiceError_ExceedLimit=6;
+var ChoiceError_Capabilities=7;
+var ChoiceError_TransferPrevented=9;
+
+
+
+var ChangedStack = new Array(75);
+var ChangedStackPointer=0;	
+
+
+function CurrentStudentService() {
+    try{
+        var ServiceStatus = eval(window.parent.parent.frames[1].document.getElementById("BasicData").getAttribute("ServiceStatus"));
+    } catch (e) {
+        var ServiceStatus = BasicData.getAttribute("ServiceStatus");
+    }
+    if (ServiceStatus==0) {
+        return "Locked";
+    } else if (isEven(ServiceStatus)) {
+        return "Result";
+    } else {
+        if (isEven(parseInt(ServiceStatus/2))) {
+            return "Apply";
+        } else {
+            try{
+                if (eval(window.parent.parent.frames[1].document.getElementById("BasicData").getAttribute("AcceptedFaculty")) >0);
+                return "Transfer";
+            } catch (e) {
+                return "Apply";
+            }
+        }
+      
+    }
+    return -1;
+}
+
+function GetCertificateName(Rank) {
+    var CertificateName;
+    var Certificate = getParameterByName("Certificate",Rank)
+    try{
+        _BasicData = window.parent.parent.frames[1].document.getElementById("BasicData")
+    }
+    catch (e) {
+        window.setTimeout("GetCertificateName()", 100)
+    }
+    switch (eval(Certificate)) {
+        case 1:
+            CertificateName = "الثانوية العامة ";
+            if (parseInt(_BasicData.getAttribute("SeatNumber")) > 1010000) {
+                _BasicData.setAttribute("SeatNumber", eval(_BasicData.getAttribute("SeatNumber")))
+                //CertificateName += " نظام قديم";
+            } /*else if (parseInt(_BasicData.getAttribute("SeatNumber")) <= 1100200 && parseInt(_BasicData.getAttribute("SeatNumber")) >= 1100000 ) { //متفوقين
+                _BasicData.setAttribute("SeatNumber", eval(_BasicData.getAttribute("SeatNumber")) - 1000000)
+                 // CertificateName += " مدارس المتفوقين للعلوم والتكنولوجيا";
+            }else if (parseInt(_BasicData.getAttribute("SeatNumber")) <= 1000900 && parseInt(_BasicData.getAttribute("SeatNumber")) >= 1000300 ) { //متفوقين
+                _BasicData.setAttribute("SeatNumber", eval(_BasicData.getAttribute("SeatNumber")) - 1000000)
+                  //CertificateName += " البعثة المصرية بالسودان";
+            }else
+            {
+
+              //  CertificateName += " نظام حديث";
+            }*/
+            break;
+        case 2:
+            CertificateName = "الدبلومات والمعاهد الفنية";
+            break;
+        case 3:
+            CertificateName = "الشهادات العربية أو الأجنبية المعادلة";
+            for (var i = 0; i < _BasicData.getAttribute("Sector").split('.').length; i++) {
+                if (eval(_BasicData.getAttribute("Sector").split('.')[i]) > 0) {
+                }
+            }
+            break;
+        case 4:
+            CertificateName = "الثانوية الأزهرية";
+            if (eval(_BasicData.getAttribute("SeatNumber")) > 9000000)
+                _BasicData.setAttribute("SeatNumber", eval(_BasicData.getAttribute("SeatNumber")) - 9000000);
+            break;
+        case 5:
+            CertificateName = "الثانوية الأزهرية";
+            if (eval(_BasicData.getAttribute("SeatNumber")) > 8000000)
+                _BasicData.setAttribute("SeatNumber", eval(_BasicData.getAttribute("SeatNumber")) - 8000000);
+            break;
+    }
+    return CertificateName
+}
+//var ServerChoicesLength = <%=System.Configuration.ConfigurationSettings.AppSettings("ChoicesLength").ToString%>
+function CountAvailableFaculties(ConfigChoicesLimit) {
+    //var CurrentAcceptedFaculty = window.parent.parent.frames[1].document.getElementById("CurrentAcceptedFaculty");
+    //alert("Current Open Service Is : "+CurrentStudentService());
+    var StudentServiceStatus = CurrentStudentService()
+    switch (StudentServiceStatus) {
+        case "Locked":
+            alert("عزيزي الطالب ، جميع الخدمات متوقفه حاليا ، برجاء التأكد من تسجيل بياناتك ودرجاتك أولا");
+            window.parent.parent.location = "Default.aspx";
+            break;
+        case "Result":
+            return 0;
+            break;
+        case "Transfer":
+            return 1;
+            break;
+        case "Apply":
+            var i = 0;
+            var Count = 0
+            for (i = 1; i < 100; i++) {
+                if (DataDoc.getElementById("Specializations" + i) != null)
+                    Count += DataDoc.getElementById("Specializations" + i).getAttribute("Faculties").split(",").length - 2;
+            }
+            var Certificate = eval(getParameterByName("Certificate"));
+            if (Certificate == 4) {
+                return Count;
+            } else {
+                //تسجيل رغبات معاهد
+                if (window.parent.parent.frames[1].document.getElementById("BasicData").getAttribute("CurrentAcceptedFaculty") > 0) {
+                    if (Count >= 10) {
+                        return 10;
+                    } else {
+                        return Count;
+                    }
+                } else if (window.parent.parent.frames[1].document.getElementById("BasicData").getAttribute("CurrentAcceptedFaculty") == -1) {  //مستنفد
+                    if (Count >= 75) {
+                        return 75;
+                    } else {
+                        return Count;
+                    }
+                }else if (Count < 75 && Count != 0) {
+                    return Count;
+                } else {
+                    return 75;
+                }
+            }
+            break;
+        default:
+            alert("عزيزي الطالب ، جميع الخدمات متوقفه حاليا ، برجاء التأكد من تسجيل بياناتك ودرجاتك أولا");
+            window.parent.parent.location = "Default.aspx";
+            break;
+    }
+
+    
+}
+//get query string parameter value
+function getParameterByName(name,Rank=0) {
+	var Certificate = 1
+	if(Rank==0){
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(window.parent.parent.location.search);
+    Certificate = results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	}
+	else{
+		if ( (Rank >=101  &&Rank <=200 && Rank!=160))
+			Certificate = 3;			
+		if (Rank ==10 || Rank == 20 || Rank ==50 || Rank==1 ||Rank ==2 || Rank==5 || Rank ==3 || Rank ==6 || Rank ==160)
+			Certificate = 1;
+		if (Rank >=1000 && Rank <=9999 )
+			Certificate = 2;
+		if (Rank >=901 && Rank <=935 )
+			Certificate = 4;
+		if (Rank ==91 || Rank ==95 )
+			Certificate = 5;
+		}
+		return Certificate;
+		
+			
+	}
+	
+
+function isEven(n) 
+{
+    return isNumber(n) && (n % 2 == 0);
+}
+
+function isNumber(n) {
+    return n === parseFloat(n);
+}
+
+
+    function toggle_visibility(id) {
+        var e = document.getElementById(id);
+       
+        if (document.getElementById(id).style.display == 'none') {
+            try {
+                document.getElementById(id).style.display = "table-row";
+            }
+            catch (e) {
+                document.getElementById(id).style.display = "block";
+            }
+        }
+        else {
+            document.getElementById(id).style.display = 'none';
+        }
+		  
+     
+    }
